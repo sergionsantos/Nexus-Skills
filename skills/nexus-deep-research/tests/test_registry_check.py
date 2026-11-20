@@ -199,7 +199,7 @@ class TestCheckCommand(unittest.TestCase):
             {'source_id': 'b', 'canonical_locator': 'doi:10.1016/S0140-6736(97)11096-0', 'title': 'Ileal', 'year': '1998'},
             {'source_id': 'c', 'canonical_locator': 'https://example.com/page', 'title': 'Page'},
         ]
-        with open(os.path.join(self.d, 'sources.jsonl'), 'w') as fh:
+        with open(os.path.join(self.d, 'sources.jsonl'), 'w', encoding='utf-8') as fh:
             for r in rows:
                 fh.write(json.dumps(r) + '\n')
         self.f = FakeFetcher({'doi.org/10.1038': (200, DEEP_LEARNING_CSL), 'doi.org/10.1016': (200, WAKEFIELD_CSL)})
@@ -217,7 +217,7 @@ class TestCheckCommand(unittest.TestCase):
 
     def test_strict_does_not_fail_on_unknown(self):
         """doi.org unreachable + Crossref 404 must not be counted as fabricated by --strict."""
-        with open(os.path.join(self.d, 'sources.jsonl'), 'w') as fh:
+        with open(os.path.join(self.d, 'sources.jsonl'), 'w', encoding='utf-8') as fh:
             fh.write(json.dumps({'source_id': 'z', 'canonical_locator': 'doi:10.5281/zenodo.1234567',
                                  'title': 'Some dataset', 'year': '2020'}) + '\n')
         f = FakeFetcher({'doi.org/': (0, 'timed out'), 'api.crossref.org': (404, '')})

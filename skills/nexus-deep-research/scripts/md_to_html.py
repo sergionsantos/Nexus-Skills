@@ -436,8 +436,8 @@ def build_report(
     output_html_path = Path(output_html_path)
     template_path = Path(template_path) if template_path else _DEFAULT_TEMPLATE
 
-    md = markdown_path.read_text()
-    template = template_path.read_text()
+    md = markdown_path.read_text(encoding="utf-8")
+    template = template_path.read_text(encoding="utf-8")
     content_html, bib_html = convert_markdown_to_html(md)
 
     # Inject print CSS into the template <head> if not already present.
@@ -454,7 +454,7 @@ def build_report(
            .replace("{{CONTENT}}", content_html)
            .replace("{{BIBLIOGRAPHY}}", bib_html))
 
-    output_html_path.write_text(out)
+    output_html_path.write_text(out, encoding="utf-8")
     return output_html_path
 
 
@@ -472,7 +472,7 @@ def main():
         print(f"Error: File {md_file} not found")
         sys.exit(1)
 
-    markdown_text = md_file.read_text()
+    markdown_text = md_file.read_text(encoding="utf-8")
     content_html, bib_html = convert_markdown_to_html(markdown_text)
 
     print("=== CONTENT HTML ===")
@@ -482,4 +482,8 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     main()

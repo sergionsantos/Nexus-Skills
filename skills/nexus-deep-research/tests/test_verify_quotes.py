@@ -76,7 +76,7 @@ class TestCLI(unittest.TestCase):
             {'evidence_id': 'e3', 'source_id': 's1', 'evidence_type': 'paraphrase', 'quote': 'about 1.8k people'},
             {'evidence_id': 'e4', 'source_id': 's2', 'evidence_type': 'data_point', 'quote': 'anything'},
         ]
-        with open(os.path.join(self.d, 'evidence.jsonl'), 'w') as f:
+        with open(os.path.join(self.d, 'evidence.jsonl'), 'w', encoding='utf-8') as f:
             for e in ev:
                 f.write(json.dumps(e) + '\n')
 
@@ -84,7 +84,7 @@ class TestCLI(unittest.TestCase):
         shutil.rmtree(self.d, ignore_errors=True)
 
     def run_vq(self, *args, stdin=None):
-        r = subprocess.run([sys.executable, SCRIPT, *args], capture_output=True, text=True, input=stdin)
+        r = subprocess.run([sys.executable, SCRIPT, *args], capture_output=True, text=True, encoding='utf-8', input=stdin)
         return r.returncode, r.stdout
 
     def test_flow(self):
@@ -98,7 +98,7 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(data['counts'].get('no_snapshot'), 1)
         rc, out = self.run_vq('verify', '--dir', self.d, '--strict')
         self.assertEqual(rc, 1)
-        with open(os.path.join(self.d, 'quote_checks.jsonl')) as f:
+        with open(os.path.join(self.d, 'quote_checks.jsonl'), encoding='utf-8') as f:
             rows = {r['evidence_id']: r for r in map(json.loads, f)}
         self.assertEqual(rows['e2'].get('reason'), 'number_not_in_passage')
         self.assertNotIn('reason', rows['e1'])

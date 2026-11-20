@@ -108,7 +108,7 @@ def validate(body, bib=BIB_OK):
         f.write(text)
     try:
         v = ReportValidator(__import__('pathlib').Path(f.name))
-        with open(os.devnull, 'w') as dn:
+        with open(os.devnull, 'w', encoding='utf-8') as dn:
             old = sys.stdout
             sys.stdout = dn
             try:
@@ -173,7 +173,7 @@ class TestDocs(unittest.TestCase):
 class TestCrashes(unittest.TestCase):
 
     def run_script(self, *args):
-        return subprocess.run([sys.executable, *args], capture_output=True, text=True, timeout=60)
+        return subprocess.run([sys.executable, *args], capture_output=True, text=True, encoding='utf-8', timeout=60)
 
     def test_F15_crash_bad_url_and_non_object_json(self):
         with tempfile.TemporaryDirectory() as d:

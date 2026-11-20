@@ -35,8 +35,8 @@ class HTMLVerifier:
 
         # Read files
         try:
-            html_content = self.html_path.read_text()
-            md_content = self.md_path.read_text()
+            html_content = self.html_path.read_text(encoding="utf-8")
+            md_content = self.md_path.read_text(encoding="utf-8")
         except Exception as e:
             self.errors.append(f"Failed to read files: {e}")
             return False
@@ -217,4 +217,8 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     exit(main())

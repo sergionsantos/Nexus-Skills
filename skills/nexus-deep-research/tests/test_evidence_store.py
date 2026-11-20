@@ -16,7 +16,7 @@ def run_es(*args: str) -> dict | list:
     """Run evidence_store.py with args, return parsed JSON from stdout."""
     result = subprocess.run(
         [sys.executable, SCRIPT, *args],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding='utf-8',
     )
     if result.returncode != 0:
         raise RuntimeError(f'Exit {result.returncode}: {result.stderr}')
@@ -172,7 +172,7 @@ class TestQuoteProvenance(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
         run_es('init', '--dir', self.tmpdir)
-        with open(os.path.join(self.tmpdir, 'retrievals.jsonl'), 'w') as f:
+        with open(os.path.join(self.tmpdir, 'retrievals.jsonl'), 'w', encoding='utf-8') as f:
             f.write(json.dumps({'retrieval_id': 'R1', 'tool': 'web_extract', 'status': 'retrieved'}) + '\n')
             f.write(json.dumps({'retrieval_id': 'R2', 'tool': 'search -m extract', 'status': 'retrieved',
                                 'verbatim': False}) + '\n')
@@ -183,10 +183,10 @@ class TestQuoteProvenance(unittest.TestCase):
     def add(self, **extra):
         ev = {'source_id': 'abcdef0123456789', 'quote': f'Quote {sorted(extra.items())}', 'locator': 'p1', **extra}
         return subprocess.run([sys.executable, SCRIPT, 'add', '--json', json.dumps(ev), '--dir', self.tmpdir],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding='utf-8')
 
     def rows(self):
-        with open(os.path.join(self.tmpdir, 'evidence.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'evidence.jsonl'), encoding='utf-8') as f:
             return [json.loads(line) for line in f if line.strip()]
 
     def test_fields_persist(self):

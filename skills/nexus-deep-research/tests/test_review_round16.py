@@ -82,7 +82,7 @@ class TestOther(unittest.TestCase):
             p = pathlib.Path(d, 'r.md')
             p.write_text(text, encoding='utf-8')
             r = subprocess.run([sys.executable, os.path.join(SCRIPTS, 'validate_report.py'), '--report', str(p)],
-                               capture_output=True, text=True, timeout=60)
+                               capture_output=True, text=True, encoding='utf-8', timeout=60)
         self.assertNotEqual(r.returncode, 0, r.stdout[-500:])
         self.assertIn('No citations', r.stdout)
 
@@ -94,7 +94,7 @@ class TestOther(unittest.TestCase):
 
     def test_F16_D4_wrong_field_types(self):
         with tempfile.TemporaryDirectory() as d:
-            run = lambda *a: subprocess.run([sys.executable, *a], capture_output=True, text=True, timeout=60)  # noqa: E731
+            run = lambda *a: subprocess.run([sys.executable, *a], capture_output=True, text=True, encoding='utf-8', timeout=60)  # noqa: E731
             run(os.path.join(SCRIPTS, 'citation_manager.py'), 'init-run', '--dir', d, '--query', 'q')
             for script, payload in (('evidence_store.py', {'source_id': 5, 'quote': 7}),
                                     ('evidence_store.py', {'source_id': 'src_1', 'quote': 'q', 'locator': 5}),

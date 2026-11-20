@@ -18,12 +18,12 @@ EVIDENCE = 'a' * 16
 
 
 def write_json(path, value):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         json.dump(value, f)
 
 
 def write_jsonl(path, rows):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         for row in rows:
             f.write(json.dumps(row) + '\n')
 
@@ -94,7 +94,7 @@ class TestVerifyCoverage(unittest.TestCase):
         self.save()
 
     def read(self, name):
-        with open(os.path.join(self.dir, name)) as f:
+        with open(os.path.join(self.dir, name), encoding='utf-8') as f:
             return json.load(f)
 
     def save(self):
@@ -111,7 +111,7 @@ class TestVerifyCoverage(unittest.TestCase):
         if require_stop:
             args.append('--require-stop')
         proc = subprocess.run(args,
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding='utf-8')
         return proc.returncode, json.loads(proc.stdout)
 
     def test_delivery_requires_persisted_stop(self):
@@ -246,7 +246,7 @@ class TestVerifyCoverage(unittest.TestCase):
         os.remove(os.path.join(self.dir, 'coverage.json'))
         os.remove(os.path.join(self.dir, 'queries.jsonl'))
         proc = subprocess.run([sys.executable, VERIFY, '--dir', self.dir],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(json.loads(proc.stdout)['status'], 'missing')
 
     def test_duplicate_query_id_rejected(self):
@@ -410,9 +410,9 @@ class TestManifestMatchesSchema(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             subprocess.run([sys.executable, INIT, 'init-run', '--out-dir', d, '--query', 'Q?'],
                            check=True, capture_output=True)
-            with open(os.path.join(d, 'run_manifest.json')) as f:
+            with open(os.path.join(d, 'run_manifest.json'), encoding='utf-8') as f:
                 manifest = json.load(f)
-        with open(os.path.join(ROOT, 'schemas', 'run_manifest.schema.json')) as f:
+        with open(os.path.join(ROOT, 'schemas', 'run_manifest.schema.json'), encoding='utf-8') as f:
             schema = json.load(f)
         self.assertLessEqual(set(manifest), set(schema['properties']))
         self.assertLessEqual(set(manifest['artifact_paths']),

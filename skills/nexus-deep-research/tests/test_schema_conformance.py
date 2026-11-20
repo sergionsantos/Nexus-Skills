@@ -49,7 +49,7 @@ def schema_errors(name, row):
 
 def run(script, *args):
     r = subprocess.run([sys.executable, os.path.join(SCRIPTS, script), *args],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, encoding='utf-8')
     if r.returncode != 0:
         raise AssertionError(f'{script} {args} failed: {r.stderr}')
     return r.stdout

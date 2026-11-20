@@ -77,7 +77,7 @@ class ResearchState:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                with open(filepath, 'w') as f:
+                with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(self._serialize(), f, indent=2)
                 return  # Success
             except (IOError, OSError) as e:
@@ -107,7 +107,7 @@ class ResearchState:
     @classmethod
     def load(cls, filepath: Path) -> 'ResearchState':
         """Load research state from file"""
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
         return cls(
@@ -593,4 +593,8 @@ Examples:
 
 
 if __name__ == '__main__':
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     main()

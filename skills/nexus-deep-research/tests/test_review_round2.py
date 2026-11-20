@@ -24,7 +24,7 @@ from verify_quotes import match_quote_detail, normalize  # noqa: E402
 
 def run(script, *args):
     return subprocess.run([sys.executable, os.path.join(SCRIPTS, script), *args],
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, encoding='utf-8')
 
 
 def write_jsonl(path, rows):
@@ -168,7 +168,7 @@ class TestLayer1HonoursVerifierVotes(unittest.TestCase):
         out = json.loads(r.stdout)
         self.assertEqual(out['resolved_by_verifiers'], 2)
         # the deterministic statuses stay visible in claims.jsonl
-        claims = [json.loads(line) for line in open(os.path.join(self.d, 'claims.jsonl'))]
+        claims = [json.loads(line) for line in open(os.path.join(self.d, 'claims.jsonl'), encoding='utf-8')]
         self.assertEqual({c['support_status'] for c in claims}, {'contradicted', 'needs_review'})
 
     def test_refuted_flag_is_handed_to_the_ledger_gate(self):
@@ -247,7 +247,7 @@ class TestTableAppendix(unittest.TestCase):
             self.assertIn('a' * 16, table)
             self.assertNotIn('default build', table)
             report = os.path.join(d, 'report.md')
-            with open(report, 'w') as f:
+            with open(report, 'w', encoding='utf-8') as f:
                 f.write('# R\n\nThe steering council accepted the proposal.\n\n## Claim ledger\n\n' + table)
             r = run('claim_ledger.py', 'gate', '--dir', d, '--report', report)
             self.assertEqual(r.returncode, 0, r.stdout)
@@ -355,13 +355,13 @@ class TestMisc(unittest.TestCase):
             write_jsonl(os.path.join(d, 'sources.jsonl'), [
                 {'source_id': '1' * 16}, {'source_id': '1' * 16}, {'source_id': '2' * 16}])
             report = os.path.join(d, 'report.md')
-            with open(report, 'w') as f:
+            with open(report, 'w', encoding='utf-8') as f:
                 f.write('# Report\n\n## Findings\n\nThe model improved accuracy on the benchmark [2]. '
                         'Another study found a smaller effect in older adults [1, 2].\n')
             r = run('extract_claims.py', 'extract', '--dir', d, '--report', report)
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-            rows = [json.loads(line) for line in open(os.path.join(d, 'claims.jsonl'))]
-            with open(os.path.join(ROOT, 'schemas', 'claim.schema.json')) as f:
+            rows = [json.loads(line) for line in open(os.path.join(d, 'claims.jsonl'), encoding='utf-8')]
+            with open(os.path.join(ROOT, 'schemas', 'claim.schema.json'), encoding='utf-8') as f:
                 allowed = set(json.load(f)['properties'])
             for row in rows:
                 self.assertLessEqual(set(row), allowed, row)

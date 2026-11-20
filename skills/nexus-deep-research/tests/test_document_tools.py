@@ -67,7 +67,7 @@ class TestExtractOffice(unittest.TestCase):
 
     def run_extract(self, *srcs):
         out = os.path.join(self.d, 'out')
-        r = subprocess.run([sys.executable, EXTRACT, *srcs, '--out', out], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, EXTRACT, *srcs, '--out', out], capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(r.returncode, 0, r.stderr)
         return out
 
@@ -150,7 +150,7 @@ class TestExtractOffice(unittest.TestCase):
             z.writestr('ppt/media/logo.png', b'LOCALLOGO')
         out = os.path.join(self.d, 'out')
         r = subprocess.run([sys.executable, EXTRACT, src, '--out', out, '--images'],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn('gone.png', r.stderr)
         self.assertIn('logo.png', r.stderr)
@@ -238,7 +238,7 @@ class TestVerifyPdfText(unittest.TestCase):
     def check(self, text, *flags):
         path = os.path.join(self.d, 'r.pdf')
         make_pdf(path, text)
-        return subprocess.run([sys.executable, VERIFY_PDF, '--pdf', path, *flags], capture_output=True, text=True)
+        return subprocess.run([sys.executable, VERIFY_PDF, '--pdf', path, *flags], capture_output=True, text=True, encoding='utf-8')
 
     def test_clean_text_passes(self):
         r = self.check('The trial enrolled many patients across several sites and reported the main outcome '
@@ -252,7 +252,7 @@ class TestVerifyPdfText(unittest.TestCase):
 
     def test_missing_file_is_error(self):
         r = subprocess.run([sys.executable, VERIFY_PDF, '--pdf', os.path.join(self.d, 'nope.pdf')],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(r.returncode, 2)
 
 

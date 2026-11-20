@@ -132,10 +132,10 @@ class TestStrictCLI(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
-        with open(os.path.join(self.tmp, 'evidence.jsonl'), 'w') as f:
+        with open(os.path.join(self.tmp, 'evidence.jsonl'), 'w', encoding='utf-8') as f:
             f.write(json.dumps({'evidence_id': 'e1', 'source_id': 's1',
                                 'quote': 'The museum is not open on Mondays.'}) + '\n')
-        with open(os.path.join(self.tmp, 'claims.jsonl'), 'w') as f:
+        with open(os.path.join(self.tmp, 'claims.jsonl'), 'w', encoding='utf-8') as f:
             f.write(json.dumps({'claim_id': 'c1', 'section_id': 'finding_1',
                                 'text': 'The museum is open on Mondays.', 'claim_type': 'factual',
                                 'cited_source_ids': ['s1'], 'evidence_ids': ['e1'],
@@ -146,14 +146,14 @@ class TestStrictCLI(unittest.TestCase):
 
     def test_strict_fails_on_contradicted(self):
         r = subprocess.run([sys.executable, SCRIPT, 'verify', '--dir', self.tmp, '--strict'],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
         out = json.loads(r.stdout)
         self.assertEqual(out['factual_contradicted'], 1)
 
     def test_report_never_claims_adequate_support(self):
-        subprocess.run([sys.executable, SCRIPT, 'verify', '--dir', self.tmp], capture_output=True, text=True)
-        r = subprocess.run([sys.executable, SCRIPT, 'report', '--dir', self.tmp], capture_output=True, text=True)
+        subprocess.run([sys.executable, SCRIPT, 'verify', '--dir', self.tmp], capture_output=True, text=True, encoding='utf-8')
+        r = subprocess.run([sys.executable, SCRIPT, 'report', '--dir', self.tmp], capture_output=True, text=True, encoding='utf-8')
         self.assertNotIn('adequate support', r.stdout)
         self.assertIn('[contradicted]', r.stdout)
 

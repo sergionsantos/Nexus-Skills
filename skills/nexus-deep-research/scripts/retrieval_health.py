@@ -83,7 +83,7 @@ def read_jsonl(path):
     if not os.path.exists(path):
         return None
     rows = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for number, line in enumerate(f, 1):
             line = line.strip()
             if not line:
@@ -99,7 +99,7 @@ def read_manifest(directory):
     path = os.path.join(directory, 'run_manifest.json')
     if not os.path.exists(path):
         return None
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -124,7 +124,7 @@ def analyze_quotes(directory, paths, retrievals):
     evidence = read_jsonl(os.path.join(directory, paths.get('evidence', 'evidence.jsonl')))
     if not os.path.exists(coverage_path) or evidence is None:
         return None
-    with open(coverage_path) as f:
+    with open(coverage_path, encoding='utf-8') as f:
         high = high_priority_evidence(json.load(f))
     by_retrieval = {r.get('retrieval_id'): r for r in retrievals or []}
     non_verbatim, unknown = [], []
@@ -385,4 +385,8 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     sys.exit(main())

@@ -133,7 +133,7 @@ class TestHelpAndDocs(unittest.TestCase):
 
     def test_M2_strict_help_matches_layer4_handoff(self):
         r = subprocess.run([sys.executable, os.path.join(SCRIPTS, 'verify_claim_support.py'), 'verify', '--help'],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, encoding='utf-8')
         out = ' '.join(r.stdout.split())
         self.assertNotIn('supported or contested', out)
         self.assertIn('layer 4 has not finished', out)

@@ -15,7 +15,7 @@ def run_cm(*args: str) -> dict:
     """Run citation_manager.py with args, return parsed JSON from stdout."""
     result = subprocess.run(
         [sys.executable, SCRIPT, *args],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding='utf-8',
     )
     if result.returncode != 0:
         raise RuntimeError(f'Exit {result.returncode}: {result.stderr}')
@@ -29,7 +29,7 @@ class TestInitRun(unittest.TestCase):
             self.assertEqual(out['status'], 'ok')
 
             # Manifest exists and has correct fields
-            manifest = json.load(open(os.path.join(d, 'run_manifest.json')))
+            manifest = json.load(open(os.path.join(d, 'run_manifest.json'), encoding='utf-8'))
             self.assertEqual(manifest['version'], '3.0.0')
             self.assertEqual(manifest['query'], 'test question')
             self.assertEqual(manifest['mode'], 'deep')
@@ -94,7 +94,7 @@ class TestRegisterSource(unittest.TestCase):
         self.assertEqual(out2['status'], 'duplicate')
 
     def _rows(self):
-        with open(os.path.join(self.tmpdir, 'sources.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'sources.jsonl'), encoding='utf-8') as f:
             return [json.loads(line) for line in f if line.strip()]
 
     def test_source_family_persisted(self):
@@ -112,14 +112,14 @@ class TestRegisterSource(unittest.TestCase):
     def test_source_family_must_be_string(self):
         r = subprocess.run([sys.executable, SCRIPT, 'register-source', '--json',
                             json.dumps({'raw_url': 'https://a.example/x', 'title': 'A', 'source_family': 7}),
-                            '--dir', self.tmpdir], capture_output=True, text=True)
+                            '--dir', self.tmpdir], capture_output=True, text=True, encoding='utf-8')
         self.assertNotEqual(r.returncode, 0)
         self.assertEqual(self._rows(), [])
 
     def test_registered_source_conforms_to_schema(self):
         """Every persisted key must be declared in source.schema.json (additionalProperties: false)."""
         schema_path = os.path.join(os.path.dirname(__file__), '..', 'schemas', 'source.schema.json')
-        with open(schema_path) as f:
+        with open(schema_path, encoding='utf-8') as f:
             schema = json.load(f)
         self.assertFalse(schema.get('additionalProperties', True))
         self.assertEqual(schema['properties'].get('source_family', {}).get('type'), 'string')

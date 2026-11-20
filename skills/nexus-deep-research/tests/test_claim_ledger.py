@@ -124,10 +124,10 @@ class TestFamilies(unittest.TestCase):
     def test_build_ledger_counts_one_family_for_paper_versions(self):
         d = tempfile.mkdtemp()
         try:
-            with open(os.path.join(d, 'claims.jsonl'), 'w') as f:
+            with open(os.path.join(d, 'claims.jsonl'), 'w', encoding='utf-8') as f:
                 f.write(json.dumps({'claim_id': 'a' * 16, 'text': 'X.', 'claim_type': 'factual',
                                     'cited_source_ids': ['s1', 's2', 's3']}) + '\n')
-            with open(os.path.join(d, 'sources.jsonl'), 'w') as f:
+            with open(os.path.join(d, 'sources.jsonl'), 'w', encoding='utf-8') as f:
                 for sid, loc in (('s1', 'arxiv:2305.14251v1'), ('s2', 'arxiv:2305.14251v2'),
                                  ('s3', 'doi:10.48550/arxiv.2305.14251')):
                     f.write(json.dumps({'source_id': sid, 'canonical_locator': loc}) + '\n')
@@ -188,25 +188,25 @@ class TestGateRefutedVariants(unittest.TestCase):
             {'claim_id': 'r' * 16, 'section_id': 'finding_1', 'text': REFUTED, 'claim_type': 'factual',
              'cited_source_ids': ['s1'], 'support_status': 'supported'},
         ]
-        with open(os.path.join(self.d, 'claims.jsonl'), 'w') as f:
+        with open(os.path.join(self.d, 'claims.jsonl'), 'w', encoding='utf-8') as f:
             for c in claims:
                 f.write(json.dumps(c) + '\n')
-        with open(os.path.join(self.d, 'sources.jsonl'), 'w') as f:
+        with open(os.path.join(self.d, 'sources.jsonl'), 'w', encoding='utf-8') as f:
             f.write(json.dumps({'source_id': 's1', 'canonical_locator': 'https://peps.python.org/x'}) + '\n')
         for v in ('v1', 'v2'):
             subprocess.run([sys.executable, SCRIPT, 'vote', '--dir', self.d, '--claim-id', 'r' * 16,
                             '--verifier-id', v, '--verdict', 'refuted', '--failure-patterns', 'stale'],
-                           capture_output=True, text=True, check=True)
+                           capture_output=True, text=True, encoding='utf-8', check=True)
 
     def tearDown(self):
         shutil.rmtree(self.d, ignore_errors=True)
 
     def gate(self, report_body):
         path = os.path.join(self.d, 'report.md')
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             f.write('# Report\n\n## Finding 1\n\nPEP 703 proposes removing the GIL [2]. ' + report_body + '\n')
         r = subprocess.run([sys.executable, SCRIPT, 'gate', '--dir', self.d, '--report', path,
-                            '--max-unverified-rate', '1'], capture_output=True, text=True)
+                            '--max-unverified-rate', '1'], capture_output=True, text=True, encoding='utf-8')
         return r.returncode, r.stdout
 
     def assert_blocked(self, body):
@@ -265,10 +265,10 @@ class TestCLI(unittest.TestCase):
             {'claim_id': 'c' * 16, 'section_id': 'recommendations', 'text': 'Do X.', 'claim_type': 'recommendation',
              'cited_source_ids': [], 'support_status': 'unsupported'},
         ]
-        with open(os.path.join(self.d, 'claims.jsonl'), 'w') as f:
+        with open(os.path.join(self.d, 'claims.jsonl'), 'w', encoding='utf-8') as f:
             for c in claims:
                 f.write(json.dumps(c) + '\n')
-        with open(os.path.join(self.d, 'sources.jsonl'), 'w') as f:
+        with open(os.path.join(self.d, 'sources.jsonl'), 'w', encoding='utf-8') as f:
             f.write(json.dumps({'source_id': 's1', 'canonical_locator': 'https://www.nature.com/x'}) + '\n')
             f.write(json.dumps({'source_id': 's2', 'canonical_locator': 'https://www.reuters.com/y'}) + '\n')
 
@@ -276,7 +276,7 @@ class TestCLI(unittest.TestCase):
         shutil.rmtree(self.d, ignore_errors=True)
 
     def run_cl(self, *args):
-        r = subprocess.run([sys.executable, SCRIPT, *args], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, SCRIPT, *args], capture_output=True, text=True, encoding='utf-8')
         return r.returncode, r.stdout
 
     def vote(self, cid, vid, verdict, patterns=None):
@@ -313,12 +313,12 @@ class TestCLI(unittest.TestCase):
         self.vote('b' * 16, 'v1', 'refuted', 'number-error')
         self.vote('b' * 16, 'v2', 'refuted', 'stale,number-error')
         report_path = os.path.join(self.d, 'report.md')
-        with open(report_path, 'w') as f:
+        with open(report_path, 'w', encoding='utf-8') as f:
             f.write('Alpha claim text. Beta claim text.')
         rc, out = self.run_cl('gate', '--dir', self.d, '--report', report_path)
         self.assertEqual(rc, 1, out)
         self.assertIn('refuted claim still present', out)
-        with open(report_path, 'w') as f:
+        with open(report_path, 'w', encoding='utf-8') as f:
             f.write('Alpha claim text.')
         rc, out = self.run_cl('gate', '--dir', self.d, '--report', report_path)
         self.assertEqual(rc, 0, out)
@@ -336,7 +336,7 @@ class TestCLI(unittest.TestCase):
 
     def test_gate_unacknowledged_unverified(self):
         report_path = os.path.join(self.d, 'report.md')
-        with open(report_path, 'w') as f:
+        with open(report_path, 'w', encoding='utf-8') as f:
             f.write('Alpha claim text. Beta claim text.')
         rc, out = self.run_cl('gate', '--dir', self.d, '--report', report_path, '--max-unverified-rate', '1')
         self.assertEqual(rc, 1)
@@ -354,7 +354,7 @@ class TestCLI(unittest.TestCase):
                                 '--correction', 'Beta was 3%, not 12%.')
             self.assertEqual(rc, 0)
         self.run_cl('resolve', '--dir', self.d)
-        with open(os.path.join(self.d, 'claim_ledger.jsonl')) as f:
+        with open(os.path.join(self.d, 'claim_ledger.jsonl'), encoding='utf-8') as f:
             rows = {r['claim_id']: r for r in map(json.loads, f)}
         self.assertEqual(rows['b' * 16]['final_status'], 'refuted')
         self.assertEqual(rows['b' * 16]['corrections'], ['Beta was 3%, not 12%.'] * 2)

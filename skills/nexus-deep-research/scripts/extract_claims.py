@@ -51,7 +51,7 @@ def compute_claim_id(section_id: str, text: str) -> str:
 # ---------------------------------------------------------------------------
 
 def append_jsonl(path: str, obj: dict) -> None:
-    with open(path, 'a') as f:
+    with open(path, 'a', encoding='utf-8') as f:
         f.write(json.dumps(obj, ensure_ascii=False) + '\n')
 
 
@@ -59,7 +59,7 @@ def read_jsonl(path: str) -> list[dict]:
     rows = []
     if not os.path.exists(path):
         return rows
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:
@@ -325,7 +325,7 @@ def cmd_extract(args: argparse.Namespace) -> None:
         print(json.dumps({'error': f'Report not found: {report_path}'}), file=sys.stderr)
         sys.exit(1)
 
-    with open(report_path) as f:
+    with open(report_path, encoding='utf-8') as f:
         markdown = f.read()
 
     claims_path = os.path.join(args.dir, 'claims.jsonl')
@@ -533,4 +533,8 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     main()

@@ -17,7 +17,7 @@ def run_ec(*args: str) -> dict | list:
     """Run extract_claims.py with args."""
     result = subprocess.run(
         [sys.executable, SCRIPT, *args],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding='utf-8',
     )
     if result.returncode != 0:
         raise RuntimeError(f'Exit {result.returncode}: {result.stderr}')
@@ -64,10 +64,10 @@ class TestExtract(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
         # Create empty claims.jsonl
-        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w').close()
+        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w', encoding='utf-8').close()
         # Write sample report
         self.report_path = os.path.join(self.tmpdir, 'report.md')
-        with open(self.report_path, 'w') as f:
+        with open(self.report_path, 'w', encoding='utf-8') as f:
             f.write(SAMPLE_REPORT)
 
     def tearDown(self):
@@ -102,7 +102,7 @@ class TestExtract(unittest.TestCase):
 class TestAdd(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
-        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w').close()
+        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w', encoding='utf-8').close()
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
@@ -135,7 +135,7 @@ class TestAdd(unittest.TestCase):
 class TestListAndStats(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
-        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w').close()
+        open(os.path.join(self.tmpdir, 'claims.jsonl'), 'w', encoding='utf-8').close()
         # Add mixed claims
         for sec, text, ctype in [
             ('finding_1', 'The sky appears blue due to Rayleigh scattering.', 'factual'),

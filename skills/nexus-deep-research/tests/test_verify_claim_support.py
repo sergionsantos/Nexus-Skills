@@ -16,7 +16,7 @@ def run_vcs(*args: str, expect_fail: bool = False) -> dict | str:
     """Run verify_claim_support.py."""
     result = subprocess.run(
         [sys.executable, SCRIPT, *args],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding='utf-8',
     )
     if result.returncode != 0 and not expect_fail:
         raise RuntimeError(f'Exit {result.returncode}: {result.stderr}\n{result.stdout}')
@@ -27,7 +27,7 @@ def run_vcs(*args: str, expect_fail: bool = False) -> dict | str:
 
 
 def write_jsonl(path: str, rows: list[dict]):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         for row in rows:
             f.write(json.dumps(row) + '\n')
 
@@ -91,7 +91,7 @@ class TestVerifySupported(unittest.TestCase):
 
         # Check updated claims file
         claims = []
-        with open(os.path.join(self.tmpdir, 'claims.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'claims.jsonl'), encoding='utf-8') as f:
             for line in f:
                 claims.append(json.loads(line))
         self.assertEqual(claims[0]['support_status'], 'supported')
@@ -164,7 +164,7 @@ class TestVerifyMixed(unittest.TestCase):
         out = run_vcs('verify', '--dir', self.tmpdir)
         # Speculation doesn't need evidence
         claims = []
-        with open(os.path.join(self.tmpdir, 'claims.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'claims.jsonl'), encoding='utf-8') as f:
             for line in f:
                 claims.append(json.loads(line))
         spec = [c for c in claims if c['claim_type'] == 'speculation'][0]
@@ -206,7 +206,7 @@ class TestVerifyPartial(unittest.TestCase):
     def test_partial_support(self):
         out = run_vcs('verify', '--dir', self.tmpdir)
         claims = []
-        with open(os.path.join(self.tmpdir, 'claims.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'claims.jsonl'), encoding='utf-8') as f:
             for line in f:
                 claims.append(json.loads(line))
         # Should be partial or needs_review (not fully supported due to number/detail mismatch)
@@ -784,13 +784,13 @@ class TestStrictBlocksWeakSupport(unittest.TestCase):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
     def read_claims(self):
-        with open(os.path.join(self.tmpdir, 'claims.jsonl')) as f:
+        with open(os.path.join(self.tmpdir, 'claims.jsonl'), encoding='utf-8') as f:
             return {c['claim_id']: c for c in map(json.loads, f)}
 
     def test_strict_fails_on_needs_review(self):
         result = subprocess.run(
             [sys.executable, SCRIPT, 'verify', '--dir', self.tmpdir, '--strict'],
-            capture_output=True, text=True,
+            capture_output=True, text=True, encoding='utf-8',
         )
         self.assertEqual(result.returncode, 1, result.stdout)
         out = json.loads(result.stdout)

@@ -423,4 +423,8 @@ Uses free DOI resolver - no API key needed.
 
 
 if __name__ == '__main__':
+    import sys as _sys
+    for _s in (_sys.stdin, _sys.stdout, _sys.stderr):
+        if hasattr(_s, 'reconfigure'):
+            _s.reconfigure(encoding='utf-8', errors='replace')
     main()

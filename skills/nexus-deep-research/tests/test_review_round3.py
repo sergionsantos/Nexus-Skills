@@ -24,7 +24,7 @@ from verify_quotes import match_quote_detail, normalize  # noqa: E402
 
 def run(script, *args):
     return subprocess.run([sys.executable, os.path.join(SCRIPTS, script), *args],
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, encoding='utf-8')
 
 
 def write_jsonl(path, rows):
@@ -270,11 +270,11 @@ class TestExtract(unittest.TestCase):
 
     def extract(self, report):
         path = os.path.join(self.d, 'report.md')
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             f.write(report)
         r = run('extract_claims.py', 'extract', '--dir', self.d, '--report', path)
         self.assertEqual(r.returncode, 0, r.stderr)
-        claims = [json.loads(line) for line in open(os.path.join(self.d, 'claims.jsonl'))]
+        claims = [json.loads(line) for line in open(os.path.join(self.d, 'claims.jsonl'), encoding='utf-8')]
         return json.loads(r.stdout), {c['text'].split()[0]: c for c in claims}
 
     def test_R3_11_ranges_semicolons_and_footnotes_link(self):
