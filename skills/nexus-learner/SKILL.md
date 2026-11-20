@@ -93,12 +93,14 @@ python3 ~/.claude/skills/nexus-learner/scripts/validate-learned-skill.py <path-d
 
 Valida: frontmatter parseia · naming rules · triggers não colidem com skills existentes (grep) · secções obrigatórias presentes · claims de evidência têm conteúdo. Exit ≠0 → corrige antes de reportar. (No Windows: `PYTHONUTF8=1 python ...`.)
 
+**Skill de projecto** (`<proj>/.claude/skills/learned/<slug>/SKILL.md`): o validador já inclui a pasta `.claude/skills` ancestral do skill validado no check de triggers; também podes apontar à mão com `--skills-dir <proj>/.claude/skills` ou `SKILLS_DIR=<proj>/.claude/skills` (o default continua `~/.claude/skills`).
+
 ### 6. REPORT — linguagem de estado honesta
 
 - Reporta: path criado/actualizado · claims com evidência N/M · UNVERIFIED restantes · resultado do validador.
 - Skill nasce `status: draft` — **só passa a considerar-se provado quando disparar e ajudar 1× real**. Regista esse 1º uso no changelog do skill **e muda o status nesse momento** (não fica para depois: um draft com uso real esquecido é uma folha desactualizada).
 - **Antes de promover a active, revisão independente da CORRECÇÃO** (outro revisor/agente, lente ≠ autor): o validador só vê forma; uma generalização errada que «pareceu ajudar» auto-injecta-se via triggers para sempre. 1 passagem, findings corrigidos, depois promove.
-- Sweep de drafts estagnados: `python3 ~/.claude/skills/nexus-learner/scripts/sweep-draft-skills.py` — **cadência sugerida: semanal (numa revisão semanal tua); dono da decisão: tu** — por skill: promover (uso real houve) ou fundir/apagar. ⚠️ o sweep usa mtime como proxy (edição não-relacionada reseta o contador; uso real regista-se no changelog do skill — confirma lá antes de decidir). Skills ACTIVE obsoletos não aparecem no sweep — caça-os na revisão de changelog.
+- Sweep de drafts estagnados: `python3 ~/.claude/skills/nexus-learner/scripts/sweep-draft-skills.py` — **cadência sugerida: semanal (numa revisão semanal tua); dono da decisão: tu** — por skill: promover (uso real houve) ou fundir/apagar. ⚠️ o sweep usa mtime como proxy (edição não-relacionada reseta o contador; uso real regista-se no changelog do skill — confirma lá antes de decidir). Skills ACTIVE obsoletos não aparecem no sweep — caça-os na revisão de changelog. Para skills de projecto, corre o sweep com `--skills-dir <proj>/.claude/skills` (ou `SKILLS_DIR=...`); sem isso só vê `~/.claude/skills`.
 
 ## Anti-padrões (deste skill)
 

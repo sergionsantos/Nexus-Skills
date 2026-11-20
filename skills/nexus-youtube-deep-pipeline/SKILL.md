@@ -43,9 +43,12 @@ Process a YouTube video with maximum rigor. Goes beyond the standard extract-the
 ```bash
 SKILL=~/.claude/skills/nexus-youtube-deep-pipeline   # where this skill is installed (or ~/.codex/skills/...)
 OUT=~/youtube-knowledge                               # YOUR output folder; nothing is written elsewhere
-mkdir -p "$OUT/raw" "$OUT/raw-processed" "$OUT/digests" "$OUT/people"
+mkdir -p "$OUT/raw" "$OUT/raw-processed" "$OUT/digests" "$OUT/people" "$OUT/work"
 ```
-`/tmp/...` in the examples is only a scratch folder; use any writable folder. `$META_JSON` is the video metadata, e.g. `{"url": "...", "title": "...", "channel": "...", "date": "YYYY-MM-DD", "duration": "mm:ss"}` (`yt-dlp --dump-single-json URL` gives these values).
+`$OUT/work` holds intermediate files (cleaned transcript, draft, status/log, fact-check report). `$META_JSON` is the video metadata, e.g. `{"url": "...", "title": "...", "channel": "...", "date": "YYYY-MM-DD", "duration": "mm:ss"}`. With `--write-info-json` (Step 1) you can build it from yt-dlp's info file (`finalize_doc.py` also accepts `YYYYMMDD` dates and durations in seconds):
+```bash
+META_JSON=$(python3 -c 'import json,sys; i=json.load(open(sys.argv[1],encoding="utf-8")); print(json.dumps({"url":i["webpage_url"],"title":i["title"],"channel":i["channel"],"date":i["upload_date"],"duration":i["duration_string"]},ensure_ascii=False))' "$OUT/raw/VIDEO_ID.info.json")
+```
 
 ---
 
@@ -65,13 +68,19 @@ The skill orchestrates these steps via the bundled scripts:
 
 ## Step 1: Extract transcript
 
-The bundled scripts do **not** include an extractor: bring your own (e.g. `yt-dlp`, or any tool that exports the transcript with timestamps). The pipeline only needs a UTF-8 text/markdown file: optional frontmatter, then paragraphs of transcript text (ideally `### [mm:ss]` headings every ~45 s). Save it under `$OUT/raw/`.
+The bundled scripts do **not** include a downloader: use `yt-dlp` (or any tool that exports the transcript with timestamps). The pipeline only needs a UTF-8 text/markdown file: optional frontmatter, then paragraphs of transcript text under `### [mm:ss]` headings every ~45 s. Save it under `$OUT/raw/`. `scripts/vtt_to_raw.py` produces exactly that from yt-dlp's `.vtt` auto-subs.
 
 ```bash
-yt-dlp --skip-download --write-auto-subs --sub-langs "en.*" --sub-format vtt -o "$OUT/raw/%(id)s" "URL"   # suggestion; convert the .vtt to plain text
+yt-dlp --skip-download --write-auto-subs --sub-langs "en" --sub-format vtt --write-info-json \
+  -o "$OUT/raw/%(id)s" "URL"          # -> $OUT/raw/VIDEO_ID.en.vtt and VIDEO_ID.info.json
+python3 "$SKILL/scripts/vtt_to_raw.py" --vtt "$OUT/raw/VIDEO_ID.en.vtt" --output "$OUT/raw/VIDEO_ID.md"
 ```
 
-Capture the raw path from stdout. It will be the input to Step 2.
+**Trap: do not use `--sub-langs "en.*"`.** It matches every English variant (e.g. `en-de`, `en-US`...), requests each one, and variants such as `en-de` have returned HTTP 429. Ask for the exact track (`"en"`).
+
+`vtt_to_raw.py` strips cue tags, drops the consecutive repeated lines of rolling auto-captions and groups text into `### [mm:ss]` sections (`--window` seconds, default 45). The sliding-window overlap that remains is removed in Step 2. Its test: `python3 tests/test_vtt_to_raw.py` (run from the skill folder).
+
+The converted `$OUT/raw/VIDEO_ID.md` is the input to Step 2.
 
 ---
 
@@ -82,7 +91,7 @@ Capture the raw path from stdout. It will be the input to Step 2.
 The full algorithm is in `references/transcript-triplication-dedup.md`. Read it first time you encounter a transcript with this artefact. **Use `scripts/dedup_transcript_v3.py` by default** — it's a state-machine chunk-match dedup that works on transcripts with or without terminal punctuation. The older `dedup_transcript.py` (v1) assumes `.!?` tokenization and silently under-reduces (~1% instead of ~60%) on punctuation-less auto-caption transcripts — this once caused an LLM hallucination in production. Kept only for reference; do not use it going forward.
 
 ```bash
-python3 "$SKILL/scripts/dedup_transcript_v3.py" --raw "RAW_PATH" --output /tmp/cleaned_transcript.txt
+python3 "$SKILL/scripts/dedup_transcript_v3.py" --raw "RAW_PATH" --output "$OUT/work/cleaned_transcript.txt"
 ```
 
 Check the stderr reduction line: if reduction is well below ~30-60%, the transcript has an unusual artefact shape — inspect manually before proceeding, don't trust a low-reduction run.
@@ -111,14 +120,14 @@ Counts and sizes below are ceilings for a 90+ minute source. `generate_deep_doc.
 
 The deep prompt template is in `templates/deep_personal_development.md` (and analogues for other content types). The script `scripts/generate_deep_doc.py` calls the LLM and writes the result.
 
-**This step runs in the background by default** — the LLM call takes 2-10 minutes and any foreground caller (the Claude Code harness cuts at 120s) will kill it mid-flight. The script detaches itself and returns immediately; you poll a status file. Do not add `&`, `nohup` or a timeout wrapper, and do not pass `--foreground` in the pipeline.
+**This step runs in the background by default** — the LLM call takes 2-10 minutes and any foreground caller (the Claude Code harness cuts at 120s) will kill it mid-flight. The script detaches itself and returns immediately; you poll a status file. Do not add `&`, `nohup` or a timeout wrapper, and do not pass `--foreground` in the pipeline (except on Windows, see "Running on Windows").
 
 ```bash
 python3 "$SKILL/scripts/generate_deep_doc.py" \
-  --cleaned-transcript /tmp/cleaned_transcript.txt \
+  --cleaned-transcript "$OUT/work/cleaned_transcript.txt" \
   --video-meta '{"url": "...", "title": "...", "channel": "...", "date": "...", "duration": "..."}' \
   --content-type personal-development \
-  --output /tmp/draft_doc.md || exit 1   # check the exit code BEFORE polling
+  --output "$OUT/work/draft_doc.md" || exit 1   # check the exit code BEFORE polling
 # returns in <1s, printing the log / status / output paths
 ```
 
@@ -126,17 +135,17 @@ Then wait with the bundled poller — **never** with a bare `until grep …; do 
 
 ```bash
 "$SKILL/scripts/wait_for_status.sh" \
-  /tmp/draft_doc.md.status.json       # defaults: 90 polls x 20s
+  "$OUT/work/draft_doc.md.status.json"       # defaults: 90 polls x 20s
 case $? in
   0) : ;;                                              # done
-  1) echo "run failed";        tail -20 /tmp/draft_doc.md.log; exit 1 ;;
-  2) echo "worker died";       tail -20 /tmp/draft_doc.md.log; exit 1 ;;  # SIGKILL/OOM
+  1) echo "run failed";        tail -20 "$OUT/work/draft_doc.md.log"; exit 1 ;;
+  2) echo "worker died";       tail -20 "$OUT/work/draft_doc.md.log"; exit 1 ;;  # SIGKILL/OOM
   3) echo "timed out, or bad max_polls/interval argument"; exit 1 ;;
   *) echo "waiter did not run (rc=$?)"; exit 1 ;;      # 127 = wrong path, etc.
 esac
 # The generator itself exits 3 if another run is still working on this
 # --output; the `|| exit 1` above catches that before the poll ever starts.
-tail -20 /tmp/draft_doc.md.log        # per-provider TRY/FAIL/SKIP lines
+tail -20 "$OUT/work/draft_doc.md.log"        # per-provider TRY/FAIL/SKIP lines
 ```
 
 Use the **absolute** path, and keep the `*)` branch. Without them a mistyped or non-executable waiter returns 127, no `case` branch matches, `case` itself exits 0 — and the pipeline walks into step 4 fact-checking a draft that was never written. The old `grep` loop at least hung visibly; a missing default turns the same failure into a silent success.
@@ -145,7 +154,7 @@ Only the live child writes the status file, so a `grep` loop waits **for ever** 
 
 Three side files sit next to `--output`: `.status.json` (state `starting|running|done|error`, pid, byte count or error), `.log` (all stderr of the run), and the output doc itself. `--cleaned-transcript` must be a real path — process substitution (`<(echo ...)`) breaks, because the detached child outlives the fd.
 
-`--foreground` blocks instead of detaching. Use it only for interactive debugging, never from the pipeline.
+`--foreground` blocks instead of detaching and writes **no `.log` file**: the per-provider TRY/FAIL/SKIP lines go to the terminal (stderr), so do not `tail` a `.log`; read the terminal output, or redirect it yourself with `2>"$OUT/work/draft_doc.md.log"` to get one. The `.status.json` is still written (its `log` field then names a file that does not exist). The command's exit code is the result, so no poller is needed. Use it for interactive debugging and on Windows (see "Running on Windows").
 
 ---
 
@@ -155,16 +164,16 @@ The draft is high-volume and a model wrote it: trust nothing that is not checked
 
 ```bash
 python3 "$SKILL/scripts/fact_check.py" \
-  --draft /tmp/draft_doc.md \
-  --cleaned-transcript /tmp/cleaned_transcript.txt \
-  --report /tmp/fact_check.json
+  --draft "$OUT/work/draft_doc.md" \
+  --cleaned-transcript "$OUT/work/cleaned_transcript.txt" \
+  --report "$OUT/work/fact_check.json"
 ```
 
 Exit 0 = everything found. Exit 1 = findings, each printed with its draft line:
 - **Quotes** (text in `"..."`, `“...”` or `«...»`, 4+ words): `exact` = verbatim in the transcript (case, punctuation and accents ignored); `near` = at least 80% of its 4-word runs are present (ASR drift, one dropped word) — passes but is listed; `MISSING` = not in the transcript. A quote split with `...` is checked fragment by fragment.
 - **Numbers** (2+ digits, or `%`, `$`, a decimal, a k/M/B suffix): compared by value, so `250k` = `250,000` = `250 mil`, `1M` = `a million`, `93%` = `93 percent`, `20` = `twenty`. Anything the transcript does not contain is `UNMATCHED`. Bare single digits, list numbering, timestamps, frontmatter and the Metadados/Capítulos sections are skipped.
 
-A report line in `/tmp/fact_check.json` has `line`, `status` and the text, so findings can be fixed without re-reading the whole draft.
+A report line in `$OUT/work/fact_check.json` has `line`, `status` and the text, so findings can be fixed without re-reading the whole draft.
 
 **What it does NOT check** (named ceilings): proper names, tool names and commands (an ASR error like "Churnney" is copied faithfully and passes — read the extractor's auto-caption warning); who said a quote; whether a number is attached to the right thing (it only has to exist somewhere in the transcript). A quote translated into the draft's language reports `MISSING` by design: remove the quotation marks or replace it with the verbatim passage.
 
@@ -189,7 +198,7 @@ For each `MISSING` quote and each `UNMATCHED` number:
 Do NOT hand-write or copy the model's frontmatter. Run `scripts/finalize_doc.py`: it builds the frontmatter deterministically (fixed key order and formats, valid YAML) from the video metadata, keeps only `tema_principal`/`tags`/`topics` from the model, adds the provenance fields (`pipeline`, `pipeline_run`, `pipeline_generator`, `fact_check`, `video_id`) and refuses a draft that still has a wrapper fence or no H1. Schema: `references/frontmatter-schema.md`.
 
 ```bash
-python3 "$SKILL/scripts/finalize_doc.py" --draft /tmp/draft_doc.md \
+python3 "$SKILL/scripts/finalize_doc.py" --draft "$OUT/work/draft_doc.md" \
   --video-meta "$META_JSON" --fact-check pass \
   --content-type ai-tech --people-dir "$OUT/people" \
   --output "$OUT/digests/[categoria]/[canal]/[date] [title].md"
@@ -271,31 +280,32 @@ echo "Raw: $RAW"
 # 3. Dedupe (v3 — handles punctuation-less transcripts; v1 under-reduces silently)
 #    Write to a real file: step 4 detaches, and a <(...) fd dies with the parent shell.
 python3 "$SKILL/scripts/dedup_transcript_v3.py" \
-  --raw "$RAW" --output /tmp/cleaned_transcript.txt
-wc -c /tmp/cleaned_transcript.txt
+  --raw "$RAW" --output "$OUT/work/cleaned_transcript.txt"
+wc -c "$OUT/work/cleaned_transcript.txt"
 
-# 4. Generate (backgrounds itself — returns in <1s, then poll)
+# 4. Generate (backgrounds itself — returns in <1s, then poll.
+#    On Windows add --foreground and drop the wait/tail below: there is no .log then.)
 python3 "$SKILL/scripts/generate_deep_doc.py" \
-  --cleaned-transcript /tmp/cleaned_transcript.txt \
+  --cleaned-transcript "$OUT/work/cleaned_transcript.txt" \
   --video-meta "$META_JSON" \
   --content-type personal-development \
-  --output /tmp/draft_doc.md || exit 1
+  --output "$OUT/work/draft_doc.md" || exit 1
 
 "$SKILL/scripts/wait_for_status.sh" \
-  /tmp/draft_doc.md.status.json || { tail -20 /tmp/draft_doc.md.log; exit 1; }
+  "$OUT/work/draft_doc.md.status.json" || { tail -20 "$OUT/work/draft_doc.md.log"; exit 1; }
 
 # 5. Fact-check
 python3 "$SKILL/scripts/fact_check.py" \
-  --draft /tmp/draft_doc.md \
-  --cleaned-transcript /tmp/cleaned_transcript.txt \
-  --report /tmp/fact_check.json
+  --draft "$OUT/work/draft_doc.md" \
+  --cleaned-transcript "$OUT/work/cleaned_transcript.txt" \
+  --report "$OUT/work/fact_check.json"
 
 # 6. Fix every MISSING quote / UNMATCHED number it printed (exit 1), re-run until exit 0
 # ... see Step 5 ...
 
 # 7. Finalize (deterministic frontmatter + schema check), then move raw to Processed/
 python3 "$SKILL/scripts/finalize_doc.py" \
-  --draft /tmp/draft_doc.md --video-meta "$META_JSON" --fact-check pass \
+  --draft "$OUT/work/draft_doc.md" --video-meta "$META_JSON" --fact-check pass \
   --people-dir "$OUT/people" \
   --output "$OUT/digests/[categoria]/[canal]/[date] [title].md" || exit 1
 mv "$RAW" "$OUT/raw-processed/[categoria]/[canal]/[date] [title].md"
@@ -337,6 +347,7 @@ The generator, `fact_check.py`, `finalize_doc.py` and the dedup run on Windows w
 - `templates/deep_personal_development.md` — deep template for personal-development
 - `templates/deep_biography.md` — deep template for trader-biography / biography
 - `templates/deep_business.md` — deep template for business / ai-tech
+- `scripts/vtt_to_raw.py` — yt-dlp `.vtt` to raw transcript with `### [mm:ss]` headings (`tests/test_vtt_to_raw.py`)
 - `scripts/dedup_transcript_v3.py` — sliding-window dedup (use this; v1 kept only for reference, do not use)
 - `scripts/generate_deep_doc.py` — LLM orchestrator (backgrounds by default, provider fallback chain)
 - `scripts/wait_for_status.sh` — bounded, liveness-aware poller for the background run (use instead of a `grep` loop)

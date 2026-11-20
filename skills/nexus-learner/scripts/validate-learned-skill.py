@@ -11,7 +11,11 @@ Checks (exit 1 em qualquer falha, com lista):
   6. secção "O que não funcionou" presente (erro; --legacy degrada para aviso —
      usar só ao re-validar skills anteriores a 2026-07-18)
 
-Uso: validate-learned-skill.py [--legacy] <path.md>
+Uso: validate-learned-skill.py [--legacy] [--skills-dir PASTA] <path.md>
+
+Pastas consideradas no check de triggers: SKILLS_DIR (ou ~/.claude/skills por omissão),
+cada --skills-dir dado, e a pasta `.claude/skills` ancestral do skill validado (skills de
+projecto: <proj>/.claude/skills/learned/<slug>/SKILL.md).
 """
 import os
 import pathlib
@@ -19,8 +23,31 @@ import re
 import sys
 import unicodedata
 
-# um único root (learned/ é subdir); rglob apanha SKILL.md em subdirectorias
-SKILLS_DIRS = [pathlib.Path(os.environ.get("SKILLS_DIR") or (pathlib.Path.home() / ".claude" / "skills"))]
+# root por omissão (learned/ é subdir); rglob apanha SKILL.md em subdirectorias
+DEFAULT_SKILLS_DIR = pathlib.Path(os.environ.get("SKILLS_DIR") or (pathlib.Path.home() / ".claude" / "skills"))
+
+
+def ancestor_skills_dir(path):
+    """Pasta `.claude/skills` que contém `path` (skills de projecto), ou None."""
+    parts = path.resolve().parts
+    for i in range(len(parts) - 1, 0, -1):
+        if parts[i] == "skills" and parts[i - 1] == ".claude":
+            return pathlib.Path(*parts[: i + 1])
+    return None
+
+
+def skills_dirs_for(path, extra=()):
+    dirs = [DEFAULT_SKILLS_DIR, *map(pathlib.Path, extra)]
+    anc = ancestor_skills_dir(path)
+    if anc is not None:
+        dirs.append(anc)
+    seen, out = set(), []
+    for d in dirs:
+        k = d.resolve()
+        if k not in seen:
+            seen.add(k)
+            out.append(d)
+    return out
 REQUIRED_SECTIONS = ["detector", "anti-pattern", "forma correcta", "evid"]
 
 
@@ -36,7 +63,7 @@ def parse_frontmatter(text):
     return fm
 
 
-def check(path_str, legacy=False):
+def check(path_str, legacy=False, extra_dirs=()):
     errors, warnings = [], []
     path = pathlib.Path(path_str)
     if not path.is_file():
@@ -58,7 +85,7 @@ def check(path_str, legacy=False):
         errors.append(f"slug não é kebab-case: {slug!r}")
     if unicodedata.normalize("NFKD", slug).encode("ascii", "ignore").decode() != slug:
         errors.append(f"slug tem acentos/não-ASCII: {slug!r}")
-    if "-expertise-expertise" in slug:
+    if "-expertise-expertise" in re.sub(r"[_-]", "-", slug):
         errors.append(f"sufixo redundante -expertise-expertise: {slug!r}")
 
     # 3. secções (case-insensitive, headers ## ou ###)
@@ -122,7 +149,7 @@ def check(path_str, legacy=False):
             if len(trig) < 4:
                 warnings.append(f"trigger demasiado genérico: {trig!r}")
                 continue
-            for d in SKILLS_DIRS:
+            for d in skills_dirs_for(path, extra_dirs):
                 if not d.is_dir():
                     continue
                 for other in d.rglob("*.md"):
@@ -144,10 +171,18 @@ def main():
     args = sys.argv[1:]
     legacy = "--legacy" in args
     args = [a for a in args if a != "--legacy"]
+    extra = []
+    while "--skills-dir" in args:
+        i = args.index("--skills-dir")
+        if i + 1 >= len(args):
+            print(__doc__)
+            return 2
+        extra.append(args[i + 1])
+        del args[i : i + 2]
     if len(args) != 1:
         print(__doc__)
         return 2
-    errors, warnings = check(args[0], legacy=legacy)
+    errors, warnings = check(args[0], legacy=legacy, extra_dirs=extra)
     for w in warnings[:8]:
         print(f"⚠️  {w}")
     if errors:

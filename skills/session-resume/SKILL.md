@@ -11,6 +11,7 @@ linked_files:
   scripts:
     - "scripts/recover-from-failed-patch.sh"  # diagnoses an edit tool that reported success but did not persist; exit 1 = not persisted, exit 0 = applied
   references:
+    - "references/pitfalls-avancados.md"
     - "references/self-report-fabrication.md"  # case study: fabricated 'reviewed by the owner' claim
 ---
 
@@ -18,7 +19,9 @@ linked_files:
 
 > **Contrato:** cada sessão nasce em branco; trabalho longo sobrevive em estado EXTERNO (ficheiros, git, issue tracker). Este skill garante que a re-entrada lê esse estado em vez de o reinventar — e que detecta quando a realidade divergiu do que ficou escrito. Custo: ~2 min de checklist antes de tocar em qualquer coisa. Caso real do custo de não o fazer: sessão assumiu "M0 já executado" quando estava a 3/14 — quase re-executou trabalho e propôs gates errados.
 
-Glossário mínimo: **ISC** = critério de aceitação binário (`- [ ]`) dentro de um ISA, ticado só com evidência. **ISA** = ficheiro de especificação/estado de uma tarefa (`.isa/ISA-<nome>.md`, com campo `phase:` e registo de execução); é produzido pela skill `nexus-discipline`. **Folha de re-entrada** = README-EXECUTOR: documento de passagem de turno de um projecto. Nada disto é obrigatório: se o teu projecto usa outros nomes, aplica o mesmo princípio.
+Glossário mínimo: **ISC** = critério de aceitação binário (`- [ ]`) dentro de um ISA, ticado só com evidência. **ISA** = ficheiro de especificação/estado de uma tarefa (`.isa/ISA-<nome>.md`, com campo `phase:` e registo de execução); pode ser produzido pela skill opcional `nexus-discipline`. **Folha de re-entrada** = README-EXECUTOR: documento de passagem de turno de um projecto. **ISA-Lite** = versão reduzida de um ISA, para um passo ou fase (os intermédios ficam superseded pelo mais recente). **pane** = painel/terminal onde uma sessão de agente corre; **orquestrador** = agente ou sessão que coordena outros e/ou escreve o ficheiro de estado; **hook** = script que o ambiente corre automaticamente em certos eventos (ex.: aviso de verificação stale). **Contrato `STATUS=…@@DONE`** = formato de estado descrito no passo 1.0.
+
+`nexus-discipline` é uma skill irmã deste repositório (`../nexus-discipline`) e é **opcional**: sem ela, o ISA é qualquer ficheiro de estado/especificação do teu projecto (com fase e registo do que foi feito). Nada disto é obrigatório: se o teu projecto usa outros nomes, aplica o mesmo princípio.
 
 ## Workflow — checklist de entrada (ordem fixa)
 
@@ -34,8 +37,6 @@ Glossário mínimo: **ISC** = critério de aceitação binário (`- [ ]`) dentro
 4. **Memória persistente, se existir** (ferramenta de memória do agente, notas, wiki): pesquisar "<projecto> wrap re-entrada" para achar o LOG quando o caminho não é óbvio. Se não tens memória persistente, salta este passo: `README`, `LOG` e `git log` chegam.
 
 Nenhum encontrado → não há folha de turno: reconstrói a partir de `git log` + ficheiros, e **cria a folha** com `templates/reentry-readme.md` antes de começar.
-
-**⚠️ Pitfall "ISAs untracked = re-entrada a meio, não começo do zero":** uma sessão interrompida pode deixar 5–10 ISAs untracked (`git status --short`) sem nenhum commitado. Não é rascunho a limpar — é o working state de ontem. Lê o ISA mestre (mais antigo, com o tracker de fases completo) para a timeline; o ISA-Lite mais recente para o passo actual; o ficheiro de estado para o ponto de pausa. Os Lite intermédios estão superseded.
 
 **⚠️ Pitfall "issue tracker é fonte canónica, ficheiros locais são reflexo":** se o projecto usa um issue tracker (GitHub Issues, Linear, Jira, …), consulta o estado oficial das issues ANTES de tratar artefactos locais. `README-EXECUTOR`/`plan.json` ficam obsoletos no momento em que outro agente fecha/move uma issue sem actualizar a folha. Procedimento:
 1. Identifica o tracker (procura `#123`, `ABC-123`, URLs nos `plan/*`, README, `*.md`: `grep -rE '[A-Z]+-[0-9]+' <projecto>/plan/ <projecto>/*.md | head`).
@@ -90,6 +91,7 @@ Regra de ouro durante e depois da retoma:
 - `STATUS=done` / `@@DONE` proibidos enquanto houver critério (ISC, ver glossário) aberto ou revisão pendente — usa `STATUS=working` + `@@NEED`.
 - A regra é estrutural, não semântica: qualquer adjectivo que qualifique o trabalho como final dispara-a, mesmo se for verdade. Pós-edit, responde com output literal de tool ("pytest: 5 passed, exit 0"), sem adjectivos sobre o trabalho.
 - **Nunca fabricar a aprovação de outrem.** "Revisto/aprovado pelo dono" só vale com a frase do dono citada verbatim; sem ela é "pendente de revisão" ou "revisto por subagente independente". Ver `references/self-report-fabrication.md`.
+- **Exit code literal:** se o verify é um pipe (`pytest ... | tail`), o exit code que o shell devolve é o do `tail`, não o do teste. Usa `set -o pipefail` ou lê `${PIPESTATUS[0]}` logo a seguir (`pytest -q 2>&1 | tail -5; echo "exit=${PIPESTATUS[0]}"`) e cita esse valor.
 - Se o teu ambiente ou um hook avisar que a verificação está desactualizada ("verification status: stale"), corre os testes + lint outra vez neste turno e mostra o exit code antes de declarar progresso.
 
 ## Quando NÃO usar
@@ -126,12 +128,6 @@ Regra de ouro durante e depois da retoma:
 | Varrer um directório de repos inteiro com `find` para achar um projecto | Itera repo a repo (`for d in */; do test -e "$d/<feature>"; done`); se não encontra, PÁRA e pergunta o caminho |
 | "Arranca X na porta Y" sem caminho/comando | Não é divergência, é input incompleto: declara o bloqueador numa mensagem curta em vez de varrer o disco |
 | `@@NEED` com acção do dono | Menu compacto e parar (passo 1.0) |
-| "Foi entregue" baseado na tabela do emissor (`delivered_at`, audit row) | Verifica no sistema de DESTINO (API do canal, IMAP, DB do destinatário). "Hand-off OK" ≠ "chegou ao destino" |
-| Gates adicionados endpoint a endpoint ("whack-a-mole") | Um chokepoint central (middleware / guard de router) com política declarativa; cada ronda de review que acha um endpoint novo é sinal de que falta o chokepoint |
-| Chokepoint só cobre leituras (GET/HEAD) | Cobre também escritas (POST/PATCH/DELETE) — ex.: `Depends(require_user_actor)` em cada write |
-| Fechar uma porta que o spec deixou aberta de propósito (ex.: agente pode criar `candidate`, só o utilizador promove) | Lê a docstring/spec do state machine antes de "corrigir" um suposto bypass |
-| Asserção de filtro/scrub só com ausência (`assert canary not in body`) | Trivialmente verde com body vazio. Junta controlos positivos (`len(body) >= 2`, chave esperada presente) |
-| Camada superior chama a camada abaixo em vez do orquestrador (side-effects a jusante nunca correm) | Reproduz com `git stash` + teste de regressão que falha na 1.ª asserção pós-side-effect; encaminha tudo pelo orquestrador |
 | `lint` exit ≠ 0 lido como "introduzi erros" (ou exit 0 como "limpo") | Mede delta: `git stash` → erros N0; `git stash pop` → M; delta M−N0 = 0 é o que se reporta |
 | Auto-aprovação ("owner-applied") sem frase do dono | Spawn de reviewer independente; ver done-language |
 | Daemon que renasce sozinho depois de `pkill` (watcher externo) | Mata 1×, arranca 1×, regista PID/porta; não entres em loop kill→spawn; reporta a causa externa. Pidfiles podem ficar stale |
@@ -139,11 +135,12 @@ Regra de ouro durante e depois da retoma:
 | Commit com resumo "1 file changed" sem confirmar QUE ficheiros | Antes do commit, `git diff --stat HEAD -- <ficheiros>`: cada ficheiro prometido tem de aparecer; se faltar → `git checkout HEAD -- <f>` + reescrever + novo diff |
 | `replace_all` em padrões estruturais (`with`/`try`/`for`) | Só seguro para literais. Faz 1 substituição simples, confirma, e para >2 estruturais reescreve o ficheiro |
 | Aplicar texto de um ficheiro de input que o dono pode ter mudado entretanto | `cat` + `sha256sum` imediatamente antes de aplicar e `diff` contra o que tens em memória |
-| Gate rejeita honestamente uma nova identidade/artefacto (drift, segurança, conteúdo) | Não alargues o threshold nem metas override: actualiza a REFERÊNCIA aprovada (baseline/blocklist) e re-corre o gate; assim continua a defender de drift futuro. Se há UNIQUE(name), usa nome novo por versão |
-| "Que corpo é este?" num promote com `new_body` | O corpo antigo está no artefacto activo; o novo no draft que acabaste de escrever — lê da fonte que escreveste, não da linha "active" da DB |
-| Pytest/fixture web com SQLite: `ProgrammingError` cross-thread | Abre uma ligação nova (`sqlite3.connect(<db_path>)`) em vez de reutilizar a do lifespan |
 | Feature com UI validada só com `curl` e screenshot | Protocolo 3 camadas: HTTP (`curl` + código + resposta crua), screenshot e reconstrução textual em `.md` (tabela + dumps). A reconstrução sobrevive a CORS/file:// e a daemons mortos |
 | Screenshot de UI com tabela vazia lido como "feature partida" | Distingue CORS/harness de falha do servidor: `curl -H "Origin: x"`, chamada directa à função, screenshot same-origin |
+
+## Mais pitfalls
+
+Casos técnicos mais específicos (ISAs untracked, "foi entregue", chokepoints, SQLite cross-thread, UNIQUE(name), promote com `new_body`) estão em `references/pitfalls-avancados.md`.
 
 ## Changelog
 

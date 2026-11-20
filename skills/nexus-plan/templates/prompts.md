@@ -4,19 +4,20 @@
 
 ```
 Passe ÚNICO e cirúrgico (economia de tokens é objectivo explícito — sem re-exploração).
-Red-team o plano <path> (melhoria <X> do relatório <path-análise>, consultável).
+Revisão adversarial do plano <path> (melhoria <X> do relatório <path-análise>, consultável).
 
 **Contexto dado como verificado** (não re-verificar): <factos ground já pagos>.
 
-Ataca:
+Procura falhas em:
 a) Verifies que não podem devolver "não" ou com predicts errados (<suspeitas concretas>)
 b) Steps que partem comportamento existente (<invariantes: demos, symlinks, trabalho fechado>)
 c) Decisões locked D1-DN — alguma errada/em falta que force o executor a improvisar?
 d) **Ownership: quem corre o quê? Algum caminho em que o executor faz trabalho
    do orquestrador/humano (gates, juízo, escrita pós-revisão)?**
 e) <risco técnico específico deste plano>
+f) CLIs: erros de `argparse` são `SystemExit` (código 2), não valor de retorno — o spec tem de dizer qual dos dois o verify espera.
 
-**NÃO ataques:** mérito da melhoria (aprovado pelo dono), <decisões já tomadas>, estilo.
+**NÃO procures falhas em:** mérito da melhoria (aprovado pelo dono), <decisões já tomadas>, estilo.
 Output: findings BLOCKER/HIGH/MEDIUM com fix 1-2 linhas; verdict ACCEPT/REVISE. Máx 400 palavras.
 ```
 
@@ -30,6 +31,7 @@ Disciplina:
 - Decisões locked D1-DN invioláveis; ambiguidade fora delas → PÁRA e pergunta.
   (Typo interno óbvio do plano: corrige e REPORTA — não é ambiguidade.)
 - Verify same-turn por step, predict-then-run (escreve o esperado ANTES), exit codes visíveis.
+- CLIs: erros de `argparse` são `SystemExit` (código 2), não valor de retorno — especifica isso no spec/verify (ex.: `pytest.raises(SystemExit)` ou exit code 2 no shell).
 - If-fails não cobre o sintoma real → PÁRA com dump (Expected · Actual), não improvises.
 - <paths read-only> READ-ONLY. Zero acções públicas. <ficheiros live> — edits atómicos.
 - **REGRA ABSOLUTA:** <o gate específico deste plano — ex.: nunca escrever X sem revisão>.

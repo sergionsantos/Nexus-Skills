@@ -52,6 +52,17 @@ Regra de resolução: usa o modelo mais forte DISPONÍVEL para os papéis FORTE;
 2. Trabalho grande, multi-milestone, com gates humanos/acções públicas, ou terreno que muda ao executar → **Decision-Spec JIT**: spec de 1-2 páginas com decisões LOCKED + milestones em intenção; expande-se UM milestone de cada vez, só quando o anterior fecha. *(Validado n=1, só a 1ª expansão — cadeia multi-milestone por provar; a promessa de re-planeamento entre milestones é desenho, não traço.)*
 3. Trivial ou spec exaustivo unattended → fora deste skill (ver description).
 
+Se o utilizador nomear explicitamente o regime e este diferir do que a triagem indica: diz-lhe a divergência numa frase (qual regime a triagem indicaria e porquê), e segue o regime que ele nomeou — a decisão é do dono. Regista a divergência no PROMPTS-<run>.md; o critic-gate e o verify independente aplicam-se igual.
+
+## Glossário (termos usados neste skill)
+
+- **TIER forte / médio:** papéis, não modelos — forte = decide e revê (arquitecto, critic, copy user-facing); médio = escreve volume e executa (expansor/executor, verificador). Ver tabela de papéis.
+- **LOCKED:** decisão numerada (D1-DN) tomada pelo arquitecto, inviolável pelo executor; ambiguidade fora delas → o executor pára e pergunta.
+- **predict-then-run:** em cada Verify, escrever o resultado esperado ANTES de correr o comando, e depois comparar.
+- **JIT:** o regime Decision-Spec JIT da triagem (ponto 2): expande-se um milestone de cada vez.
+- **negative control:** caso construído de propósito para o check falhar, que prova que o check consegue devolver «não».
+- **ledger (TOKEN-LEDGER):** registo por fase do custo do run (passo 7).
+
 ## Workflow (comum aos 2 regimes)
 
 1. **Grounding pago uma vez.** Se existe análise prévia (nexus-analysis, relatório com evidência ficheiro:linha), o plano CITA-A e proíbe re-exploração aos subagentes. Nunca pagar o grounding duas vezes.
@@ -60,7 +71,7 @@ Regra de resolução: usa o modelo mais forte DISPONÍVEL para os papéis FORTE;
 4. **Executor** (tier médio): steps sequenciais quando há ficheiros partilhados; verify same-turn por step com exit codes; ambiguidade fora das decisões locked → PÁRA e pergunta; steps do orquestrador/humano NUNCA na sequência do executor. Prompt: `templates/prompts.md` §executor.
 5. **Juízo não se delega:** colunas/decisões que dependem de contexto do dono (prioridades, fit, copy pública) ficam explicitamente para o orquestrador ou humano — o executor deixa-as vazias/"orq.".
 6. **Verify independente** (lente ≠ executor ≠ revisor): re-corre contra a realidade, não contra o report; negative controls re-criados; findings → fix pelo executor → re-verify do MESMO verificador sobre o diff. Zero findings = done. Prompt: `templates/prompts.md` §verify.
-7. **Registo do traço:** PROMPTS-<run>.md (prompts verbatim + desvios) + TOKEN-LEDGER-<run>.md (tokens por fase, medidos onde a ferramenta os expõe). É o que permite calibrar o método — sem ledger não há economia provada.
+7. **Registo do traço:** PROMPTS-<run>.md (prompts verbatim + desvios) + TOKEN-LEDGER-<run>.md. Se o ambiente expõe contagem de tokens, o ledger regista tokens por fase. Se NÃO expõe (sem contador é impossível inventá-los), regista por fase a duração e o nº de subagentes e marca a coluna de tokens como «não medido»; nunca estimes tokens como se fossem medidos. Sem ledger não há economia provada (com «não medido», fica provado só o esforço, não o custo em tokens).
 
 ## Operacional (o que os traços ensinaram — detalhe em `references/patterns.md`)
 
@@ -75,7 +86,7 @@ Artefactos = markdown + python3 stdlib. Nada no plano pode assumir tooling espec
 
 ## Verificação (confirmar que o skill funcionou)
 
-No fim de um run: verify independente limpo registado · TOKEN-LEDGER com total dentro de ~50-300k (fora disso, explicar porquê) · critic-gate registado com verdict e findings · zero trabalho declarado done sem lente independente.
+No fim de um run: verify independente limpo registado · TOKEN-LEDGER registado e, se o ambiente mede tokens, com total dentro de ~50-300k (fora disso, explicar porquê); se o ambiente NÃO mede tokens, este critério é **não avaliável** (não passa nem falha; o ledger de duração/subagentes tem de existir) · critic-gate registado com verdict e findings · zero trabalho declarado done sem lente independente.
 
 ## Quando NÃO usar
 

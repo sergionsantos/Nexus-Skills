@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # nexus-analysis — scaffold do arranque (fase SCOPE)
 # Uso: scaffold.sh <dir-projecto> <slug-sistema> <N> [data YYYY-MM-DD]
-# Cria: <dir>/.analysis/checklist-analise-<slug>.md + <dir>/Analysis/<N>-Melhorias-<data>.md (esqueleto com N secções)
+# Cria: <dir>/.analysis/checklist-analise-<slug>.md + <dir>/Analysis/<N>-Melhorias-<data>.md (esqueleto com as secções "## 1." e "## 2..N." — expande-o até ficarem N secções de melhoria numeradas)
 set -eu
 DIR="${1:?uso: scaffold.sh <dir-projecto> <slug-sistema> <N> [data]}"
 SLUG="${2:?falta slug}"
 N="${3:?falta N}"
 DATA="${4:-$(date +%F)}"
-# validação de args (calibração 2026-07-20: `scaffold.sh "Projecto" 7 .` gerou checklist-analise-7.md + .-Melhorias-*.md — slug e N trocados, sem erro)
+# validação de args (ordem trocada, p.ex. `scaffold.sh "Projecto" 7 .`, geraria ficheiros com slug e N trocados sem erro)
 case "$N" in (*[!0-9]*|'') echo "FAIL: N='$N' não é inteiro — ordem dos args: <dir-projecto> <slug-sistema> <N> [data]"; exit 1;; esac
 case "$SLUG" in (.|..|''|*/*) echo "FAIL: slug='$SLUG' inválido"; exit 1;; esac
 case "$DATA" in ([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; (*) echo "FAIL: data='$DATA' não é YYYY-MM-DD"; exit 1;; esac
@@ -31,7 +31,7 @@ date: $DATA
 
 # Checklist — análise $SLUG: $N melhorias
 
-> Actualiza \`phase:\` AO ENTRAR em cada fase (observe→explore→synthesize→structure→verify→learn) — não só no fim. Duas calibrações (2026-07-20) saltaram observe→complete de uma vez; a folha mente durante horas se a phase só muda no fecho.
+> Actualiza \`phase:\` AO ENTRAR em cada fase (observe→explore→synthesize→structure→verify→learn) — não só no fim; senão a folha mente durante horas.
 
 ## ISCs (binários)
 - [ ] GROUND: secção "Estado real verificado" — cada linha com comando+resultado
@@ -47,4 +47,4 @@ sed -e "s/{Sistema}/$SLUG/g" -e "s/{N}/$N/g" -e "s/{data}/$DATA/g" \
   "$SKILL_DIR/templates/report-template.md" > "$REL"
 
 echo "criado: $checklist"
-echo "criado: $REL (esqueleto — expande as N secções conforme playbook-structure)"
+echo "criado: $REL (esqueleto com '## 1.' e '## 2..N.': substitui '## 2..N.' por secções '## 2.' … '## $N.' até teres $N melhorias, conforme playbook-structure)"

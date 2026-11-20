@@ -10,9 +10,9 @@ Análise priorizada de melhorias para um sistema, app ou projecto **já existent
 GROUND (estado real vs documentado) → EXPLORE (4-5 lentes em paralelo) → SYNTHESIZE → STRUCTURE (relatório) → VERIFY (check mecânico + revisão independente). Existe também um modo delta para re-análises (`references/playbook-delta.md`). Começa por ler `SKILL.md` e o exemplo `references/worked-example-task-tracker.md`.
 
 ## Instalação
-Copia (ou faz symlink) da pasta `nexus-analysis/` para `~/.claude/skills/` ou `~/.codex/skills/`.
+Copia (ou faz symlink) da pasta `nexus-analysis/` para `~/.claude/skills/` ou `~/.codex/skills/`. No Windows o equivalente é `%USERPROFILE%\.claude\skills\` (ou `%USERPROFILE%\.codex\skills\`).
 
 ## Dependências
-- Bash, `grep`, `sed` (os scripts em `scripts/` são `scaffold.sh` e `verify-report.sh`; no Windows usa Git Bash ou WSL).
-- Idealmente um runtime com subagentes (exploração paralela e revisão fresh); sem eles o método corre em modo solo e o relatório fica «por rever».
+- Bash, `grep`, `sed` (os scripts em `scripts/` são `scaffold.sh` e `verify-report.sh`). No Windows precisas de **Git Bash** (ou WSL) para os correr; nos exemplos usa `$TMPDIR` ou a pasta de trabalho em vez de `/tmp` à mão, porque o `/tmp` do Git Bash não coincide com a pasta temporária do Windows.
+- Idealmente um runtime com subagentes (exploração paralela e revisão fresh). Sem eles o método corre em modo solo e a revisão independente tem duas alternativas: (1) abrir uma sessão nova (ou outro modelo) e colar VERBATIM o prompt do revisor de `references/playbook-verify.md` («Prompt pronto para o revisor») com o relatório e o código; (2) se não for possível, marcar o relatório `mechanically-verified` («por rever») em vez de `final` — a secção `## Verificação independente` tem de existir na mesma para o `verify-report.sh` passar.
 - Skills relacionadas (opcionais): `nexus-plan-spec`, `nexus-discipline`, `session-wrap`.

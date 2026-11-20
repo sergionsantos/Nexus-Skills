@@ -1,5 +1,7 @@
 # Personas incluídas
 
+> **Aviso:** as âncoras `[ancora: ficheiro.md#secção | "citação"]` de cada `LENS.md` apontam para fontes que **não estão incluídas** neste repo. Não as consegues abrir nem verificar; a citação verbatim é o único vestígio.
+
 24 pessoas públicas, cada uma com um `LENS.md` (formato em `../references/lens-format.md`): pasta `<Nome>/LENS.md`.
 
 | Área | Personas |

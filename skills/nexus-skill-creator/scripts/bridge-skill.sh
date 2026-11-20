@@ -3,7 +3,7 @@
 # Torna um skill disponível em DOIS agentes (por omissão Claude Code e Codex):
 #   A = ~/.claude/skills   B = ~/.codex/skills   (sobrepõe com --a/--b ou SKILLS_DIR_A/SKILLS_DIR_B)
 # A pasta real do skill fica onde já existe; no outro lado cria-se um symlink (ou, com --copy, uma cópia).
-# Idempotente. Casos:
+# Idempotente em modo symlink; com --copy uma 2.ª corrida dá CONFLITO (rc 1). Casos:
 #   - skill só em A (ou só em B)          -> cria symlink/cópia no outro lado
 #   - já ligado (symlink para o original) -> no-op
 #   - pastas reais nos dois lados         -> CONFLITO, reconcilia à mão (diff -r)

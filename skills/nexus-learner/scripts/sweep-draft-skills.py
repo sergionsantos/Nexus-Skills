@@ -6,7 +6,9 @@ Um skill draft que nunca disparou em semanas ou (mais comum) disparou mas ningue
 actualizou o status e uma folha desactualizada a mentir com autoridade — caso real:
 session-resume ficou `draft` 15 dias com uso real confirmado (2026-07-18).
 
-Uso: sweep-draft-skills.py [--days N]   (default: só drafts com >=7 dias; SKILLS_DIR=pasta de skills, default ~/.claude/skills)
+Uso: sweep-draft-skills.py [--days N] [--skills-dir PASTA]   (default: só drafts com >=7 dias;
+SKILLS_DIR=pasta de skills, default ~/.claude/skills; para skills de projecto usa
+--skills-dir <proj>/.claude/skills)
 Accao por linha: promover (uso real houve) ou fundir/apagar (nunca disparou).
 """
 import os
@@ -16,10 +18,15 @@ import sys
 import time
 
 ROOT = pathlib.Path(os.environ.get("SKILLS_DIR") or (pathlib.Path.home() / ".claude" / "skills"))
+if "--skills-dir" in sys.argv:
+    try:
+        ROOT = pathlib.Path(sys.argv[sys.argv.index("--skills-dir") + 1])
+    except IndexError:
+        sys.exit("usage: sweep-draft-skills.py [--days N] [--skills-dir PASTA]")
 try:
     min_days = int(sys.argv[sys.argv.index("--days") + 1]) if "--days" in sys.argv else 7
 except (IndexError, ValueError):
-    sys.exit("usage: sweep-draft-skills.py [--days N]")
+    sys.exit("usage: sweep-draft-skills.py [--days N] [--skills-dir PASTA]")
 
 rows = []
 for md in ROOT.rglob("*.md"):

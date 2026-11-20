@@ -14,7 +14,8 @@ Copia (ou faz symlink) da pasta `session-resume/` para `~/.claude/skills/` ou `~
 - `SKILL.md` — checklist de 5 passos + anti-padrões.
 - `templates/reentry-readme.md` — folha de re-entrada para novos projectos.
 - `scripts/recover-from-failed-patch.sh` — confirma se uma edição realmente persistiu.
+- `references/pitfalls-avancados.md` — pitfalls técnicos específicos.
 - `references/self-report-fabrication.md` — caso de estudo.
 
 ## Dependências
-Nenhuma obrigatória. Usa git e, opcionalmente, uma memória persistente, um issue tracker e as skills `session-wrap` e `nexus-discipline`.
+Nenhuma obrigatória. Usa git e, opcionalmente, uma memória persistente, um issue tracker e a skill `session-wrap` e a skill irmã `nexus-discipline` (`../nexus-discipline`, opcional: sem ela, o ISA é qualquer ficheiro de estado).

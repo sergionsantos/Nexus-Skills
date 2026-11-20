@@ -11,6 +11,9 @@ TIMEOUT_SECONDS=5
 
 json_provider() {
   local name="$1" available="$2" exec_method="$3" binary="$4" models="$5"
+  # Escape backslashes and quotes so Windows paths yield valid JSON (changed vs upstream)
+  binary="${binary//\\/\\\\}"
+  binary="${binary//\"/\\\"}"
   printf '{"name":"%s","available":%s,"exec_method":"%s","binary":"%s","models":[%s]}' \
     "$name" "$available" "$exec_method" "$binary" "$models"
 }

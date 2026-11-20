@@ -15,8 +15,8 @@ Invocacao: `nexus-persona-council <modo> <persona|painel> — <caso>`.
 ## 0. Configuracao (corre uma vez por sessao)
 
 - **Pasta de personas** (`<PERSONAS>`): onde estao os `LENS.md`. Usa, por ordem: a pasta indicada no pedido; a variavel de ambiente `PERSONAS_DIR`; uma pasta `personas/` na raiz do projecto actual; por fim, a pasta `personas/` desta skill (24 personas incluidas, ver `personas/README.md`). Se o utilizador pedir uma persona que nao existe em nenhuma, PARA e pergunta: nao inventes personas.
-- **Pasta de saida** (`<SAIDA>`): por omissao `<PERSONAS>/../persona-council-output/` (ou outra indicada pelo utilizador). Contem `Pareceres/` e `Perspetivas/`.
-- Formato dos `LENS.md`: `references/lens-format.md`.
+- **Pasta de saida** (`<SAIDA>`): por omissao `./persona-council-output/` no directorio de trabalho do projecto actual (nunca dentro da pasta da skill instalada; ou outra indicada pelo utilizador). Contem `Pareceres/` e `Perspetivas/`.
+- Formato dos `LENS.md`: `references/lens-format.md`. Termos desta skill (type-1/type-2, RPD, STOP, cue, ledger, Tiger/Paper Tiger/Elephant, teste Ohio): `references/glossary.md`.
 
 ---
 

@@ -11,6 +11,8 @@ description: Escreve um spec/plano de build EXAUSTIVO e determinístico (10-20k 
 
 O leitor do spec é um **executor literal sem juízo**: faz exactamente o que está escrito e NADA que não esteja. O spec só é bom se: zero decisões abertas, zero âncoras ambíguas, zero valores por confirmar, cada step verificável com output real. Métrica única: *"um modelo médio chega ao fim sem nunca ter de adivinhar?"*
 
+**Termos:** *executor literal* = o agente/modelo que executa o spec à letra, sem juízo próprio (§acima). *Locked Decisions Register* = a lista numerada de decisões D01… emitida antes de qualquer step (fase 3); cada decisão fixa uma escolha com o seu porquê e passa a ser lei para os steps.
+
 ## §0 — OPERATING MODE (obrigatório, seja qual for o modelo que invoca esta skill)
 
 Isto não é estilo — é o método. Um modelo que salte estas regras produz "mais um plano", não um plano-spec.
@@ -41,10 +43,10 @@ Isto não é estilo — é o método. Um modelo que salte estas regras produz "m
 Feature reference verificado (fonte primária citada por claim; incertezas `⚠️ UNVERIFIED`; adições próprias `[ASSUMED]`). Se não existe, produzi-lo primeiro (research pass separado). O plano nunca inventa comportamento do produto-alvo — resolve os `⚠️` com decisão explícita registada.
 
 ### 2. Reality-check do ambiente antes de fechar valores
-Aplicar §0.1 ao stack inteiro: inspeccionar containers, compose/proxy/env reais, portas ocupadas, serviços em falta, roles/passwords da DB. **Timing: ANTES de emitir o primeiro step de execução** — num caso real o reality-check só aconteceu depois de 12 passes e obrigou a reescrever o M0. Valores de env no plano = valores REAIS verificados. O que faltar no ambiente vira STEP novo, não nota de rodapé.
+Aplicar §0.1 ao stack inteiro: inspeccionar containers, compose/proxy/env reais, portas ocupadas, serviços em falta, roles/passwords da DB. **Timing: ANTES de emitir o primeiro step de execução** — num caso real o reality-check só aconteceu depois de 12 passes e obrigou a reescrever o M0. Valores de env no plano = valores REAIS verificados. O que faltar no ambiente vira STEP novo, não nota de rodapé. O exemplo cita containers/compose/DB/proxy, mas aplica-se ao stack que existir: num projecto Python pequeno basta verificar a versão do interpretador e as dependências, e fixar o caminho do Python (`.venv/Scripts/python` no Windows, `.venv/bin/python` em Linux/macOS). Os comandos de verify (`ls`, `grep`, `sed`…) dependem do shell: escreve-os para o shell onde o executor corre (Git Bash/bash vs PowerShell) e diz qual no §0 do plano.
 
 ### 3. Locked Decisions Register = espinha dorsal
-Toda decisão numerada (D01…) numa tabela única emitida ANTES de qualquer step. Versões pinadas exactas e verificadas no registry (o red-team apanha pins inventados). Precedência explícita: amendments > decisões de milestone > Register > texto dos steps.
+Toda decisão numerada (D01…) numa tabela única (linhas `| D01 | decisão | porquê |`) ou em bullets `- **D01:** …`, emitida ANTES de qualquer step; o validador conta as duas formas. Versões pinadas exactas e verificadas no registry (o red-team apanha pins inventados). Precedência explícita: amendments > decisões de milestone > Register > texto dos steps.
 
 ### 4. Perguntas mínimas ao dono → amendments
 Só o que genuinamente não se decide sozinho. Respostas = camada de amendment; a precedência resolve — o plano não se reescreve. Amendments = tabela única no `00-README` (fonte canónica). `D###-R` = revisão de D### (mesma raiz numérica); decisão nova = número novo. **Tie-break amendment-vs-amendment:** o mais recente vence; se o conflito for real (não substituição), resolve-se com D novo que os reconcilia — nunca deixar os dois de pé para o executor escolher.
@@ -57,7 +59,7 @@ Só o que genuinamente não se decide sozinho. Respostas = camada de amendment; 
 **Paralelizar autoria de milestones (pre-flight obrigatório):** o modo por defeito é SEQUENCIAL de propósito — cada pass vê o estado acumulado do anterior, o que evita de graça a classe de erro abaixo. Se paralelizares (agentes independentes, um por milestone, para ganhar tempo — legítimo), corre PRIMEIRO um **registo de recursos partilhados**: lista os ficheiros que mais de um milestone vai tocar e o PRÓXIMO número livre de cada sequência global (migrations, D#, F#), e ATRIBUI cada recurso contestado a um milestone específico ANTES de disparar os autores — nunca deixes dois agentes cegos decidirem cada um "o próximo livre é X". Inclui também as **invariantes transversais de verificação** (ex.: "todos os endpoints exigem autenticação") no prompt comum. É barato (uma tabela + grep) e mata a colisão na origem. O red-team continua obrigatório (§8): apanha bugs de lógica que nada têm a ver com paralelismo. Casos medidos em `references/parallel-authoring-and-token-economy.md`.
 
 ### 6. Formato de step atómico (invariável)
-`Goal / Depends on / Files touched / Behavior spec / Implementation (código COMPLETO paste-ready, zero "...") / Commands / Verify / If verify fails / Done when`. O Behavior spec descreve o comportamento do produto-alvo DENTRO do step. O Verify segue §0.4 (predict-then-run, dumps reais, estado fixado). Cabeçalho de step: `### Step M<N>.<M> — <título>`.
+`Goal / Depends on / Files touched / Behavior spec / Implementation (código COMPLETO paste-ready, zero "...") / Commands / Verify / If verify fails / Done when`. O Behavior spec descreve o comportamento do produto-alvo DENTRO do step. O Verify segue §0.4 (predict-then-run, dumps reais, estado fixado). Cabeçalho de step: `### Step M<N>.<M> — <título>`. Exemplo completo e mínimo (2 milestones, 4 steps, passa o validador): `references/example-mini-plan.md`.
 
 ### 7. Consistência a 15k linhas — mecanismos onde há tooling, disciplina assistida no resto
 
@@ -76,9 +78,9 @@ Só o que genuinamente não se decide sozinho. Respostas = camada de amendment; 
 ### 9. Kit de execução (o plano não basta)
 - `00-README-EXECUTOR.md`: precedência, factos do ambiente, índice D##, **routing de modelos** (passos com modelo forte exigem gate humano; o resto é colar ficheiros).
 - Steps de infra partilhada com `⛔ GATE PRÉ-APLICAÇÃO`.
-- **Compatibilidade com `nexus-discipline`:** MILESTONE-CADENCE (1 marco por milestone, steps intermédios só "verify-OK") + VERIFY-PREFLIGHT-GATE (desvio não coberto pela failure-tree → PÁRA + dump tabular). O gate assume failure-tree por step **garantida por construção** — por isso o validador trata "If verify fails" em falta como FAIL, não warning.
+- **Compatibilidade com `nexus-discipline`:** MILESTONE-CADENCE (1 marco por milestone, steps intermédios só "verify-OK") + VERIFY-PREFLIGHT-GATE (desvio não coberto pela failure-tree → PÁRA + dump tabular). (Definições: `../nexus-discipline/SKILL.md` §4 e §5, se instalada; `../nexus-discipline/references/glossary.md`.) O gate assume failure-tree por step **garantida por construção** — por isso o validador trata "If verify fails" em falta como FAIL, não warning.
 - Validador mecânico: `scripts/validate-plan-spec.sh <ficheiro.md>` — IDs de step únicos · fences balanceadas · Verify e If-verify-fails (**contagem total ≥ nº de steps**, FAIL se menor; não verifica step a step) · placeholders proibidos (FAIL) · Done-when/Files/Commands/D## (contagens). **NÃO valida** (disciplina manual): grafo de dependências entre steps (ciclos passam), forward-refs bidireccionais, contiguidade D##, re-derivação de constantes.
-- Notas sobre o validador: precisa de cabeçalhos `### Step M<N>.<M> — …` (travessão); aceita `**Files touched:**` e `**Files touched**:`; "duplicate step IDs" pode ser falso positivo quando há cross-refs em cabeçalhos.
+- Notas sobre o validador: precisa de cabeçalhos `### Step M<N>.<M> — …` (separador `—`, `–` ou `-`; 0 steps detectados é FAIL); D## aceita bullets `- **D01:` e linhas de tabela `| D01 |`; aceita `**Files touched:**` e `**Files touched**:`; "duplicate step IDs" pode ser falso positivo quando há cross-refs em cabeçalhos.
 
 ### 10. Persistência e re-entrada
 Guarda as decisões num ficheiro de estado/âncora (D## + estado de cada milestone) e, se tiveres memória persistente, um ponteiro para ele. Fecha a sessão com um resumo de passagem (ver `session-wrap`, se instalada).
@@ -127,6 +129,7 @@ Corpo em `references/execution-subroutines.md`: (1) verify literal fresh com exi
 
 ## Referências
 
+- `references/example-mini-plan.md` — spec completo mínimo (CLI `hello`) no formato §6, validado.
 - `references/critic-protocol.md` — 4 lentes adversariais + armadilhas do próprio critic.
 - `references/redteam-dispatch-prompts.md` — prompts de despacho por lente.
 - `references/state-snapshot-template.md` — snapshot por milestone.

@@ -1,6 +1,6 @@
 # Formato do `LENS.md` (motor de julgamento de uma persona)
 
-A skill `nexus-persona-council` so funciona com personas que tenham um `LENS.md`. Esta pagina descreve o formato esperado. A skill **nao traz personas**: tu escreves (ou geras) os `LENS.md` das pessoas cujo juizo queres usar, com base em material real (livros, transcricoes, entrevistas).
+A skill `nexus-persona-council` so funciona com personas que tenham um `LENS.md`. Esta pagina descreve o formato esperado. A skill traz 24 personas ja prontas em `personas/` (ver `personas/README.md`); para qualquer outra pessoa, escreves (ou geras) tu o `LENS.md`, com base em material real (livros, transcricoes, entrevistas).
 
 ## O que e
 

@@ -296,7 +296,7 @@ Run all members **IN PARALLEL**. Each member sees ONLY the problem statement (bl
 **Dispatch by exec_method** (from routing table):
 
 **For `subagent` (Anthropic)** — spawn as Claude Code subagent:
-- Use `subagent_type` matching the council member's agent name (agents are in <skill>/agents/)
+- Run each member as a generic subagent and give it the absolute path of `<skill>/agents/council-{name}.md` to read. Agents are not registered in a clean install, so do not use `subagent_type` (it only applies if the agents were registered with the host)
 - Use the `model` parameter from the routing table (opus/sonnet/haiku) to override the agent's default if needed
 
 **For `codex_exec` (OpenAI)** — run via Bash tool:
@@ -537,6 +537,8 @@ Tie-breaking operates on the **structured `STANCE:` lines** collected in STEP 5 
 **Always record the tally** (`option → weight`, which seat carried 1.5×, and each backer's confidence factor) in the verdict's Vote Tally field, so the decision is auditable without re-reading the transcript.
 
 ### STEP 7: Synthesize Verdict (CHAIRMAN)
+
+> **Precedence:** when this protocol is run through the skill's `SKILL.md` (single-provider subagent path), SKILL.md prevails: the main session acts as Chairman and no separate synthesis call is dispatched. The logic below is unchanged for multi-provider runs.
 
 Synthesis is performed by the **Chairman selected in STEP 1.7**, not by the coordinator. Dispatch the synthesis as a single call (subagent / codex_exec / gemini_cli / ollama_run / cursor_cli / openai-compatible — whichever matches the Chairman's provider) using the prompt template below.
 

@@ -22,4 +22,4 @@ Idempotente em modo symlink (com `--copy`, uma 2ª corrida dá conflito); falha 
 No Windows corre em Git Bash; se o symlink falhar (precisa de Modo de Programador), usa `--copy`.
 
 ## Dependências
-Bash. Opcional: `python3` + PyYAML para o check de frontmatter.
+Bash. Opcional: Python (`python3`; no Windows/Git Bash usa `python`, pois `python3` pode ser o atalho da Microsoft Store) + PyYAML para o check de frontmatter.

@@ -4,8 +4,8 @@
 #
 # Uso:  bash scripts/recover-from-failed-patch.sh <path-de-files> [<marker>]
 #
-# Saída: o conteúdo actual do ficheiro (echo) + 1 linha de diagnóstico,
-#        e sai 0 (ok / sem marcador para testar) ou 1 (bug confirmado).
+# Saída: linhas DIAG (nº de linhas do ficheiro e resultado do marcador;
+#        NÃO imprime o conteúdo do ficheiro), e sai 0 (ok / sem marcador para testar) ou 1 (bug confirmado).
 #
 # Se "bug confirmado", a próxima acção é: abandonar o patch e
 # re-escrever o ficheiro inteiro.

@@ -46,7 +46,7 @@ Não repitas o inventário completo. Verifica só:
 
 - **1-2 agentes nas zonas QUENTES**: dirs/ficheiros tocados desde a análise anterior (`git diff --stat <commit-da-análise>..HEAD` dá a lista; sem git, mtime). Lente: "o que a execução das melhorias antigas partiu ou deixou a meio" — fixes introduzem regressões (observado no caso-âncora: fix de review introduziu edge-case novo apanhado na ronda 2).
 - **1 agente com lente NOVA** (ângulo que a análise anterior NÃO usou ou usou fraco — ex.: se a anterior era código-pesada, manda integração/ecossistema). Anti-cegueira: o delta herda os pontos cegos do mapa antigo; a lente nova é o antídoto — não é opcional. **Nota de vocabulário:** "fresh/independente" fica reservado para o REVISOR do VERIFY — este agente de exploração NÃO conta como review (desvio nº1 dos modelos médios).
-- **NUNCA** re-correr as 4-5 lentes completas sobre zonas não tocadas — é o desperdício que este modo existe para evitar. Excepção: reconciliação encontrou ≥2 REGREDIDAS → o sistema está a degradar por baixo dos fixes; escala para análise a frio. (O threshold "≥2" é adição de método, não traço — ajusta com uso real.)
+- **NUNCA** re-correr as 4-5 lentes completas sobre zonas não tocadas — é o desperdício que este modo existe para evitar. Excepção: reconciliação encontrou ≥2 REGREDIDAS → o sistema está a degradar por baixo dos fixes; escala para análise a frio. (O threshold "≥2" é adição de método, não do exemplo trabalhado — ajusta com uso real.)
 
 ## Passo 4 — SYNTHESIZE com regras extra
 

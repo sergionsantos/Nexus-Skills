@@ -21,7 +21,7 @@ Most sessions need NO wrap (disposable). Only wrap themes you will re-enter.
 The wrap is about **what THIS session worked on in THIS workspace** — never about what a memory/search tool happens to surface. Run this phase before writing anything:
 
 1. **Identify the workspace.** `pwd` + git root. This is the anchor for everything below.
-2. **Look for an active spec/plan:** e.g. `ls <workspace>/.isa/ISA-*.md`, a `PLAN.md`, a spec or ticket file. If found, its title/scope IS the topic, and it becomes the authoritative source.
+2. **Look for an active spec/plan:** a spec/plan file (e.g. `PLAN.md`, `SPEC.md`, an issue/ticket) or, if it exists, `.isa/ISA-*.md` (format of the nexus-discipline skill; check with `ls <workspace>/.isa/ISA-*.md`). If found, its title/scope IS the topic, and it becomes the authoritative source.
 3. **No spec/plan → the session itself is the primary source.** Derive the topic from what was actually done in this conversation: files touched, decisions made, the user's opening request.
 4. **Supplement with workspace signals** if the session context is thin (post-compaction, long session): `git log --oneline -10`, existing `Wraps/`/`LOG*.md` in the workspace, files modified today (`find <workspace> -name "*.md" -mtime -1`).
 5. **Set the start of the theme** (session start if unsure). Anything before it is out of scope; this prevents mixing parallel work streams.
@@ -39,7 +39,7 @@ The destination is configurable; ask the user once if there is no convention, an
 
 - **Naming:** always `wrap-<slug>-<YYYY-MM-DD>.md` — lowercase `wrap-` prefix, greppable. Not `WRAP-*`, not `LOG-*`, not bare `<slug>-<date>`.
 - **Never:** inside `.isa/` (spec ≠ state), loose in the project root, in `.audit/`, or as `LOG-*.md`. `LOG.md`-style files are running project journals — a wrap may LINK to them, not replace or impersonate them.
-- If the project is a code repo, never commit wrap files into it (keep `Wraps/` untracked or ignored).
+- If the project is a code repo, never commit wrap files into it (keep `Wraps/` untracked or ignored; to ignore it locally without touching `.gitignore`: `echo Wraps/ >> .git/info/exclude`).
 - Existing wraps in old locations: leave them. Migration is a separate task, never a side effect of a new wrap.
 
 ## Procedure
@@ -52,7 +52,7 @@ The destination is configurable; ask the user once if there is no convention, an
    - **Pendente + limitações** — open items, known limitations, risks. This is the most important section: never promote planned → done, never omit limitations.
    - **Ficheiros** — files/artifacts touched or produced (paths).
    - **Lições** — non-obvious things learned that a future session should not rediscover (optional, only if real).
-   Cite each claim's source: `[A#]` for a curated artifact (spec/plan/doc), `[R#]` for a raw record (commit, log, search hit); list the sources at the end. Be faithful.
+   Cite each claim's source: `[A#]` for a curated artifact (spec/plan/doc), `[R#]` for a raw record (commit, log, search hit); list the sources at the end (e.g. `[A1] PLAN.md`, `[R1] commit abc1234`). Be faithful. Full example: [references/example-wrap.md](references/example-wrap.md).
 4. Review: diff the draft against the specific new content written this round (spec, LOG, commits). A draft can silently omit or misattribute the round's central finding; fix by hand. The spec/plan remains the source of truth; the wrap is the re-entry index.
 5. **Optional — persistent memory pointer.** Only if the user has a persistent memory tool: save ONE short record with topic, date and the wrap file path (and 2-3 lines of state). Then verify by searching for the topic — only report the wrap complete if the search returns the record. If you have no such tool, skip this step; the file path is the re-entry pointer.
 6. Report to the user: the wrap path, a 3-5 line summary, and anything marked PENDING.
@@ -77,7 +77,7 @@ If a memory/search tool you wanted to use is offline or returns nothing useful, 
 | Writing the wrap as `WRAP-*.md` in the project root, inside `.isa/`, or as `LOG-*.md` | `Wraps/` subdir, `wrap-` prefix; LOG.md is a different artifact |
 | Moving old wraps to the new location "while at it" | Migration is a separate, deliberate task |
 | Reporting done without verifying the memory pointer (when one was written) | Search must return the pointer record |
-| Trusting an automatically assembled summary because it looks coherent | Retrieval can return records from an adjacent project, not this session. Treat it as an INDEX; add a `FIDELITY NOTE` pointing at the session's authoritative artifact and report both paths |
+| Trusting an automatically assembled summary because it looks coherent | Retrieval can return records from an adjacent project, not this session. Treat it as an INDEX; add a `FIDELITY NOTE` (a line in the wrap saying that the summary was assembled automatically and is only an index, followed by the path of the authoritative artifact) pointing at the session's authoritative artifact and report both paths |
 | A parallel stream's spec/plan file never made it into the repo (worktree cleaned up before commit) | Before wrapping a multi-stream round, check every stream's spec landed (`git ls-files .isa/ \| grep <topic>`); if one is missing, write its section from commit messages + session, and say explicitly what was lost |
 | Spec passed as a source but the draft still omits the round's central finding | Always compare the draft to what was newly written this round, every time |
 

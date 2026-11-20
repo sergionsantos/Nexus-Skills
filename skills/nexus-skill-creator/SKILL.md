@@ -1,6 +1,6 @@
 ---
 name: nexus-skill-creator
-description: "Criação disciplinada de skills novas de raiz, thin e doctrine-first: skills nascem com triggers+anti-triggers, secção de verificação user-facing, regra anti-acreção, changelog, e estado draft até 1º uso real. Usar quando o utilizador diz '/nexus-skill-creator', 'cria um skill para X', 'transforma este workflow num skill', 'nova skill'. Para EVAL PESADO (benchmark, viewer, iterações com baselines) usar o skill-creator oficial do plugin, se instalado. Para extrair uma lição da sessão actual usar nexus-learner."
+description: "Criação disciplinada de skills novas de raiz, curtas (corpo mínimo, detalhe em references/) e centradas na doutrina (regras e porquês primeiro, não código): skills nascem com triggers+anti-triggers, secção de verificação user-facing, regra anti-acreção, changelog, e estado draft até 1º uso real. Usar quando o utilizador diz '/nexus-skill-creator', 'cria um skill para X', 'transforma este workflow num skill', 'nova skill'. Para EVAL PESADO (benchmark, viewer, iterações com baselines) usar o skill-creator oficial do plugin, se instalado. Para extrair uma lição da sessão actual usar nexus-learner."
 version: 0.2.1
 status: active
 category: nexus
@@ -30,14 +30,15 @@ Se a origem é "captura o workflow desta conversa": extrai passos/tools/correcç
 ```bash
 ls ~/.claude/skills/ | grep -i "<termo>"; grep -rli "<tópico>" ~/.claude/skills/*/SKILL.md | head -5
 ```
-Grep apanha literais, não sinónimos — **complementa com uma pesquisa semântica** se tiveres uma (pesquisa na memória persistente ou no histórico com a frase de intent do passo 1), como o nexus-learner exige. Skill parecido existe → **estender** (nova secção/reference + changelog) em vez de criar. Regista a decisão.
+(`~/.claude/skills` é a pasta de skills do Claude Code; se usas outra pasta, troca-a. Se também usas Codex, repete em `~/.codex/skills`.)
+Grep apanha literais, não sinónimos — **complementa com uma pesquisa semântica** se tiveres uma (ex.: memória persistente ou histórico de sessões pesquisável, com a frase de intent do passo 1), como o nexus-learner exige; se não tiveres, salta e confia no grep, tentando sinónimos à mão. Skill parecido existe → **estender** (nova secção/reference + changelog) em vez de criar. Regista a decisão.
 
 ### 2b. LOCALIZAÇÃO — onde o skill nasce (decide ANTES de escrever)
 
 - Lição/tooling de UM repo → pasta de skills do projecto (ex.: `.claude/skills/` dentro do repo).
 - Cross-project, só Claude Code → `~/.claude/skills/<slug>/`.
-- **Skill que mais do que um agente tem de descobrir** (ex.: Claude Code E Codex, que lê `~/.codex/skills/`): um skill só numa das pastas é invisível ao outro agente; "criei o skill" sem a segunda localização é falso para metade das ferramentas.
-- **Não é default — é on-demand e fácil:** quando o pedido incluir "disponibiliza também no Codex" (ou equivalente), corre `bash <pasta-deste-skill>/scripts/bridge-skill.sh <nome>` — idempotente, mantém a pasta real onde já está e cria o symlink (ou `--copy`) no outro lado, verificando que `SKILL.md` resolve nos dois paths. Usa `--dry-run` para ver o que faria; ver `README.md`.
+- **Skill que mais do que um agente tem de descobrir** (ex.: Claude Code E Codex, que lê `~/.codex/skills/`; sem Codex instalado, o lado B fica vazio e podes omitir este passo): um skill só numa das pastas é invisível ao outro agente; "criei o skill" sem a segunda localização é falso para metade das ferramentas.
+- **Não é default — é on-demand e fácil:** quando o pedido incluir "disponibiliza também no Codex" (ou equivalente), corre `bash <pasta-deste-skill>/scripts/bridge-skill.sh <nome>` — idempotente em modo symlink (com `--copy` a 2.ª corrida dá CONFLITO), mantém a pasta real onde já está e cria o symlink (ou `--copy`) no outro lado; `--a DIR --b DIR` aceita pastas à escolha em vez de `~/.claude/skills`/`~/.codex/skills`, verificando que `SKILL.md` resolve nos dois paths. Usa `--dry-run` para ver o que faria; ver `README.md`.
 
 ### 3. DESIGN — estrutura por tamanho (progressive disclosure)
 
@@ -66,12 +67,12 @@ Estilo: explica o porquê — modelos têm theory of mind; instruções com raz�
 - Escreve 1-2 test prompts realistas + **prediz o comportamento esperado** antes de correr (predict-then-run).
 - Corre 1× (tu próprio ou subagente com o skill).
 - Negative control **obrigatório sempre que existam keywords partilhadas com outros skills/pedidos** (é onde o trigger-design falha): prompt near-miss que NÃO devia disparar → confirma que não dispara. Só dispensável quando o trigger é inequivocamente único.
-- Frontmatter parseia: `python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]).read().split('---')[1])" <SKILL.md>`
-- **Eval a sério** (benchmark, viewer, baselines, iterações, description optimization): usa o `skill-creator` oficial do plugin — a maquinaria existe lá, não se duplica.
+- Frontmatter parseia (precisa de PyYAML; usa `python3`, ou `python` no Windows/Git Bash, onde `python3` pode ser o atalho da Microsoft Store): `python -c "import yaml,sys; yaml.safe_load(open(sys.argv[1], encoding='utf-8').read().split('---')[1])" <SKILL.md>`
+- **Eval a sério** (benchmark, viewer, baselines, iterações, description optimization): usa o `skill-creator` oficial do plugin, se o tiveres instalado — a maquinaria existe lá, não se duplica; senão, repete o smoke com mais prompts.
 
 ### 6. STATUS + manutenção
 
-- Nasce `status: draft`. **Activa** após 1º uso real com sucesso (regista no changelog) **E revisão independente da correcção** (critic/code-reviewer, lente ≠ autor — INCONDICIONAL, não só para trabalho sem supervisão: um skill de doutrina auto-injecta via triggers, é unattended por definição; o smoke do passo 5 é a lente do autor e não chega — paridade com nexus-learner).
+- Nasce `status: draft`. **Activa** após 1º uso real com sucesso (regista no changelog) **E revisão independente da correcção** (um revisor independente — outro agente/subagente ou pessoa com lente ≠ autor; se não tiveres nenhum, relê tu o skill noutra sessão com contexto limpo — INCONDICIONAL, não só para trabalho sem supervisão: um skill de doutrina auto-injecta via triggers, é unattended por definição; o smoke do passo 5 é a lente do autor e não chega — paridade com nexus-learner).
 - **Regra anti-acreção (a mais violada no ecossistema):** pitfall/war-story novo = **1 linha na tabela de anti-padrões + corpo em `references/<slug>.md`** — NUNCA secção inline nova. SKILL.md que passa das ~250 linhas = cirurgia de emagrecimento antes de qualquer conteúdo novo. (Caso real: um skill de disciplina chegou a 606 linhas por acreção inline em 4 dias, contra a sua própria decisão de arquitectura.)
 - Updates passam por review independente quando o skill guia trabalho unattended.
 - Version bump + changelog em toda a alteração de comportamento.

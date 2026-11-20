@@ -1,8 +1,8 @@
 # Checklists EXPLORE por stack — greps e comandos prontos
 
-> Complemento do `playbook-explore.md`: cola a checklist da stack no prompt do agente da lente respectiva. São greps concretos — adapta paths, mantém a lógica. Marcação: tudo aqui é adição de método (generalizado do traço Next/Supabase + prática; só a stack A vem directamente do traço).
+> Complemento do `playbook-explore.md`: cola a checklist da stack no prompt do agente da lente respectiva. São greps concretos — adapta paths, mantém a lógica. Marcação: tudo aqui é adição de método (generalizado do exemplo trabalhado Next/Supabase + prática; só a stack A vem directamente desse exemplo).
 
-## Stack A — Next.js + Supabase (traço-fonte: um gestor de tarefas web)
+## Stack A — Next.js + Supabase (caso interno do autor, não incluído: um gestor de tarefas web)
 
 **Arquitectura/código**
 - Testes vs camadas críticas: `find src -name "*.test.*"` e cruza com `src/lib/sync|hooks/*mutations*|lib/api` — gap = finding
@@ -39,12 +39,12 @@
 - Entry points vs docs: `cat package.json | jq .bin,.scripts` — scripts documentados existem?
 - Error handling no transport: `grep -rn "process.on('uncaughtException'\|unhandledRejection'" src` — 0 = crash silencioso
 - Tools MCP: por tool registada, schema de input validado? handler com try/catch?
-- **Query de ouro MCP** (equivalente da query de ouro da Stack A; encontrado em calibração real 2026-07-20, maior rácio ganho/diff do relatório): por handler/tool exportado em `src/tools/` (ou equivalente), existe registo no servidor (`srv.tool(`/`server.setRequestHandler`)? Contagem de exports vs contagem de registos no entry point — export sem registo = capacidade construída e invisível ao cliente = valor latente.
+- **Query de ouro MCP** (equivalente da query de ouro da Stack A; encontrado num caso interno do autor (não incluído), maior rácio ganho/diff do relatório): por handler/tool exportado em `src/tools/` (ou equivalente), existe registo no servidor (`srv.tool(`/`server.setRequestHandler`)? Contagem de exports vs contagem de registos no entry point — export sem registo = capacidade construída e invisível ao cliente = valor latente.
 - Estado: onde persiste? ficheiro sem lock = corrupção com 2 instâncias
 - Logging: PRIMEIRO verifica se existe logger estruturado próprio (grep por `logEvent`/`logger`/tabela de eventos) — se existir, contagem de `console.log` é proxy sem significado. Só na ausência: `grep -rn "console.log" src | wc -l` alto = debugging impossível em produção
 - Versões: `npm outdated` — nota: com N pequeno quase nunca vira finding (majors atrás sem dor evidente = descarte); corre no fim, só se sobrar orçamento de lente
 
-## Stack F — Sistema quantitativo / trading / data pipelines (calibração real 2026-07-20, pipeline de dados de mercado)
+## Stack F — Sistema quantitativo / trading / data pipelines (caso interno do autor, não incluído: pipeline de dados de mercado)
 
 > Híbrido research+batch+market-data+registry+automação — nenhuma stack única encaixa; usa Stack B como base parcial + isto. Aqui o risco NÃO está em rotas-vs-testes: está em gates falso-verdes, harnesses re-derivados e claims históricos contraditórios.
 
@@ -59,7 +59,7 @@
 - **Scheduler + watchdog**: automação crítica tem watchdog? `last_run` antigo com zero alertas a chegar ao dono = watchdog em falta.
 - Contagens brutas (`except Exception`, nº de testes) são MAPA, não finding — em pipelines best-effort o catch-all é deliberado; o finding é onde a falha é engolida sem mudar exit code nem chegar ao operador.
 
-## Stack E — Notas pessoais (Obsidian ou similar) / PKM / gestão pessoal (calibração real 2026-07-20, non-code)
+## Stack E — Notas pessoais (Obsidian ou similar) / PKM / gestão pessoal (caso interno do autor, não incluído; non-code)
 
 > Unidade de evidência aqui NÃO é `ficheiro:linha` — é **ficheiro + secção/mtime/contagem** (uma daily note não tem "linha" relevante; tem secção vazia/não-vazia e blocos repetidos). O resto do operating mode aplica-se igual (grep-zero conta, predict-then-run, etc.).
 

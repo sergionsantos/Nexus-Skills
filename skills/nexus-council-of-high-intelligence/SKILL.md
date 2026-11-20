@@ -30,6 +30,7 @@ State and lock the mode, the panel and the 1.5× domain-weight seat before Round
 Use the protocol's single-provider path. Skip the protocol's provider detection, model routing and external-provider dispatch (STEP 1 paths A/B, `codex_exec`, `gemini_cli`, `ollama_run`, `cursor_cli`, `openai_compatible_api`); they are optional extras. Report `single provider (subagents)`. The `--models`, `--dry-route`, `--no-auto-route` flags and `.council.yaml` routing keys do not apply.
 
 Dispatch all members of each round together, in one call to your subagent tool (the Task/Agent tool of your host, e.g. in Claude Code):
+- Council members are NOT registered agents in a clean install: run each member as a generic subagent and give it the absolute path of `agents/council-{name}.md` to read (never use `subagent_type`).
 - Each member reads its complete `agents/council-{name}.md` (path inside this skill's folder; give subagents the absolute path) and receives the protocol's round-specific prompt verbatim plus the case context.
 - Keep all rounds and word limits: problem-restate gate, blind-first Round 1, anonymized Round 2, Round 3 crystallization ending with the exact `STANCE: | CONFIDENCE: | DEALBREAKER:` line — or the Quick/Duo equivalents.
 - Assign stable Member A/B/C labels before Round 2; strip self-attribution from blind outputs; never disclose the mapping to members. Restore names only in the Chairman synthesis.
@@ -41,7 +42,7 @@ Dispatch all members of each round together, in one call to your subagent tool (
 ## Tally and Chairman
 Apply STEP 6 exactly: base weight 1.0, domain seat 1.5×, confidence high/med/low = 1.0/0.75/0.5, consensus = two-thirds of total base weight. Below the threshold, present the split; do not force consensus.
 
-The main session acts as Chairman (do not spawn another agent) and writes the verdict with the exact Council/Quick/Duo Verdict template from the protocol, leading with Unresolved Questions and ending with Session Metadata. Set `provider_count: 1` and `fallbacks_triggered: none` unless a real failure occurred.
+The main session acts as Chairman (do not spawn another agent; this takes precedence over protocol STEP 1.7/STEP 7, which describe dispatching the synthesis to a separate call) and writes the verdict with the exact Council/Quick/Duo Verdict template from the protocol, leading with Unresolved Questions and ending with Session Metadata. Set `provider_count: 1` and `fallbacks_triggered: none` unless a real failure occurred.
 
 ## Do not
 - Skip or merge rounds, or rename/reorder/drop template sections.

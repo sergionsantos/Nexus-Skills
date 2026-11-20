@@ -12,11 +12,11 @@ Perguntas-teste (aplica por ordem; primeira que der SIM decide):
 
 - **P (Partido):** "Se nada mudar, isto falha ou já está a falhar?" — app down, bug de invalidação, secrets demo, zero error boundaries. Inclui *vai partir* (divergência que rebenta no próximo arranque).
 - **L (Latente):** "O custo de construir já foi pago e falta só expor/colher?" — tabela com RLS sem UI, campo filtrável sem picker, config sem página. Teste mecânico: existe no schema/backend E grep-zero na UI.
-- **T (Transformação):** "Isto muda QUEM usa o sistema ou PARA QUÊ?" — novo tipo de utilizador (agentes AI via MCP), nova categoria de uso. Perguntas-guia para gerar T (não esperes que venha dos agentes — no traço, a transformação nasceu aqui, na síntese):
+- **T (Transformação):** "Isto muda QUEM usa o sistema ou PARA QUÊ?" — novo tipo de utilizador (agentes AI via MCP), nova categoria de uso. Perguntas-guia para gerar T (não esperes que venha dos agentes — no exemplo trabalhado, a transformação nasceu aqui, na síntese):
   - Que utilizador/uso este sistema ainda não serve mas devia, dado o ecossistema do dono?
   - O que é que o dono faz hoje FORA do sistema que devia acontecer dentro?
   - Se este sistema falasse com os outros sistemas do dono, o que ficava possível?
-  - **Fonte concreta de T (calibração 2026-07-20, serviço Node/MCP):** lê as checklists/wraps FECHADAS (`phase: complete`) do próprio projecto à procura de capacidades já validadas mas nunca embarcadas na superfície pública (ex.: `synth_answer` validado em eval, nunca promovido a MCP tool). Não é grep — é leitura de vereditos; rende T com evidência de que o custo de validação já foi pago.
+  - **Fonte concreta de T (caso interno do autor, não incluído; serviço Node/MCP):** lê as checklists/wraps FECHADAS (`phase: complete`) do próprio projecto à procura de capacidades já validadas mas nunca embarcadas na superfície pública (ex.: `synth_answer` validado em eval, nunca promovido a MCP tool). Não é grep — é leitura de vereditos; rende T com evidência de que o custo de validação já foi pago.
 
 Finding que não é P, L nem T → provavelmente ruído; marca DESCARTE com razão de 3 palavras.
 
@@ -28,7 +28,7 @@ Finding que não é P, L nem T → provavelmente ruído; marca DESCARTE com raz�
 3. Cluster de 1 finding só sobrevive se for grande sozinho (app down = cluster de 1, e é #1).
 4. Anti-teste: se dois clusters teriam a MESMA acção, funde-os; se um cluster precisa de duas acções sem relação, parte-o.
 
-Resultado esperado: N slots a conter 2-4× N findings (traço: 7 slots ≈ 20+ achados).
+Resultado esperado: N slots a conter 2-4× N findings (exemplo trabalhado: 7 slots ≈ 20+ achados).
 
 ## Passo 4 — Scoring e selecção dos N
 
@@ -39,7 +39,7 @@ Para cada cluster, estima em escala grossa (não finjas precisão):
 
 Quotas obrigatórias nos N seleccionados: **≥1 P, ≥1 L, ≥1 T.** Se não tens T, volta às perguntas-guia do passo 2 — quase nunca "não há"; há "não procurei".
 
-**N não se enche honestamente?** Entregar N-1 sólidos vence encher com um fraco ("evidência ou não entra" > bater o número) — MAS o descarte do último candidato tem de ficar ESCRITO no relatório (sub-secção `### Nota de calibração — porquê N-1` dentro da secção de verificação: candidato, evidência que tinha, razão do descarte). Prometer a nota no cabeçalho e não a escrever é referência forward quebrada — foi um MAJOR real apanhado em review (calibração 2026-07-20). Usa `###` (não `##`) para não quebrar a contagem do check mecânico.
+**N não se enche honestamente?** Entregar N-1 sólidos vence encher com um fraco ("evidência ou não entra" > bater o número) — MAS o descarte do último candidato tem de ficar ESCRITO no relatório (sub-secção `### Nota de calibração — porquê N-1` dentro da secção de verificação: candidato, evidência que tinha, razão do descarte). Prometer a nota no cabeçalho e não a escrever é referência forward quebrada — foi um MAJOR real apanhado em review (caso interno do autor, não incluído). Usa `###` (não `##`) para não quebrar a contagem do check mecânico.
 
 ## Passo 5 — Registo de descartes (adição de método; não vem do traço)
 

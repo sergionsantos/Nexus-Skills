@@ -16,7 +16,8 @@
 #
 # Saída: 0 (OK) ou 1 (fail) com diagnóstico.
 # Prefix-match nos markers (aceita `**Goal:**` em parágrafo ou `- **Goal**` em bullet).
-# O Step ID aceita prefixos (M-E2E-N.M).
+# O Step ID aceita prefixos (M-E2E-N.M). O separador do cabeçalho pode ser —, – ou -.
+# Decisões D##: aceita bullets "- **D01:" ou linhas de tabela "| D01 |".
 
 set -u
 
@@ -34,12 +35,15 @@ bad() { echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
 # === 1. Step IDs únicos (aceita M<N>.<M> e M-E2E-N.M) ===
 echo ""
 echo "=== 1. Step IDs únicos ==="
-STEP_HEADERS=$(grep -cE "^#{3,4} (Step )?(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?[[:space:]]+—" "$PLAN")
-HDR_LINES=$(grep -E "^#{3,4} (Step )?(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?[[:space:]]+—" "$PLAN")
+STEP_HEADERS=$(grep -cE "^#{3,4} (Step )?(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?[[:space:]]+(—|–|-)" "$PLAN")
+HDR_LINES=$(grep -E "^#{3,4} (Step )?(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?[[:space:]]+(—|–|-)" "$PLAN")
 STEP_IDS=$(echo "$HDR_LINES" | grep -oE "(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?" | sort -u)
 DUP_IDS=$(echo "$HDR_LINES" | grep -oE "(M[0-9]+\.[0-9]+|M-[A-Z0-9]+-[0-9]+\.[0-9]+)(\.[0-9]+)?" | sort | uniq -d)
 UNIQUE_COUNT=$(echo "$STEP_IDS" | wc -l | tr -d ' ')
 echo "  step headers: $STEP_HEADERS, unique: $UNIQUE_COUNT"
+if [ "$STEP_HEADERS" -eq 0 ]; then
+  bad "0 step headers detectados (formato: '### Step M<N>.<M> — título'; aceita —, – ou -)"
+fi
 if [ -z "$DUP_IDS" ]; then
   ok "no duplicate step IDs"
 else
@@ -97,7 +101,7 @@ echo "  $IFFAILS_COUNT If-verify-fails / $STEP_HEADERS steps"
 if [ "$STEP_HEADERS" -gt 0 ] && [ "$IFFAILS_COUNT" -lt "$STEP_HEADERS" ]; then
   bad "$IFFAILS_COUNT If-verify-fails < $STEP_HEADERS steps (obrigatório por step — contrato VERIFY-PREFLIGHT-GATE de nexus-discipline)"
 elif [ "$STEP_HEADERS" -eq 0 ]; then
-  warn "0 steps detectados — coverage não avaliável neste ficheiro"
+  echo "  (0 steps: já reportado como FAIL na secção 1)"
 else
   ok "If-verify-fails por step completo"
 fi
@@ -127,7 +131,8 @@ ok "$MIG_COUNT migration reference(s) NNNN_slug (informational)"
 # === 9. D-numbered decisions ===
 echo ""
 echo "=== 9. D-numbered decisions ==="
-D_COUNT=$(grep -cE "^- \*\*D[0-9]+(-R)?:" "$PLAN")
+# aceita bullets "- **D01:" e linhas de tabela "| D01 |" (também "| **D01** |" e D01-R)
+D_COUNT=$(grep -cE "^- \*\*D[0-9]+(-R)?:|^\|[[:space:]]*\**D[0-9]+(-R)?\**[[:space:]]*\|" "$PLAN")
 if [ "$D_COUNT" -ge 1 ]; then
   ok "$D_COUNT D-numbered decisions"
 else

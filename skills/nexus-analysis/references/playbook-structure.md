@@ -57,6 +57,6 @@ Incluir quando o dono decide prioridades sem ler os 20 achados técnicos (relat�
 | Resumo executivo com paths/greps | Linguagem de negócio; a evidência fica nas secções técnicas |
 | Acção vaga ("melhorar error handling") | Passos concretos + opção mínima nomeada |
 | Impacto genérico ("aumenta qualidade") | 1 frase comparativa ancorada no contexto do dono |
-| Contagem citada sem o comando que a gerou | Regista comando exacto (corpus+padrão) junto ao número — a review re-conta e diverge se o padrão for ambíguo (caso navItems/catches, 2026-07-20: rondas evitáveis) |
+| Contagem citada sem o comando que a gerou | Regista comando exacto (corpus+padrão) junto ao número — a review re-conta e diverge se o padrão for ambíguo (caso interno do autor, não incluído: rondas evitáveis) |
 | Ordem sem racional visível | Tabela posição→porquê + trade-offs por extenso |
 | Relatório vira spec de implementação | Acção pára no "o quê + por onde começar"; steps → /nexus-plan-spec |

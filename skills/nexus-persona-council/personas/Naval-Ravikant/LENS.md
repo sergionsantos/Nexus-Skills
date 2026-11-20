@@ -1,9 +1,10 @@
 # LENS — Naval Ravikant
 
-> Âmbito: vários "frameworks" do PERSONA.md são de terceiros (Deutsch, Popper,
-> Taleb, Buffett, Scott Adams, Karpathy, Séneca) adoptados sem cunhagem — já
-> movidos para Influências no ROSTER.md. Este LENS usa só raciocínio próprio
-> dele sobre casos reais (negócio, angel investing, recrutamento, Q&A).
+> Âmbito: vários "frameworks" do PERSONA.md (ficheiro interno, não incluído
+> neste repo) são de terceiros (Deutsch, Popper, Taleb, Buffett, Scott Adams,
+> Karpathy, Séneca) adoptados sem cunhagem — foram movidos para Influências
+> num ROSTER.md igualmente interno, não incluído. Este LENS usa só raciocínio
+> próprio dele sobre casos reais (negócio, angel investing, recrutamento, Q&A).
 
 ## 1. Cues e pesos
 

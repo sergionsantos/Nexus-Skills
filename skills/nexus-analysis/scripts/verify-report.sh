@@ -28,7 +28,7 @@ fail=0
 [ "$secs"   -eq "$esperado_secs" ] || { echo "FAIL: secções ## = $secs, esperado $esperado_secs (N+3, +1 por Resumo executivo, +1 por Reconciliação em delta)"; fail=1; }
 [ "$estado" -eq 1 ]        || { echo "FAIL: falta secção '## Estado real verificado'"; fail=1; }
 [ "$ordem"  -eq 1 ]        || { echo "FAIL: falta secção '## Ordem...'"; fail=1; }
-[ "$verif"  -eq 1 ]        || { echo "FAIL: falta secção '## Verificação independente' — relatório NÃO revisto"; fail=1; }
+[ "$verif"  -eq 1 ]        || { echo "FAIL: falta secção '## Verificação independente' (tem de existir, mesmo que diga «por rever» — estado mechanically-verified) — relatório NÃO revisto"; fail=1; }
 [ "$probs"  -eq "$N" ]     || { echo "FAIL: **Problema:** = $probs, esperado $N"; fail=1; }
 [ "$accs"   -eq "$N" ]     || { echo "FAIL: **Acção:** = $accs, esperado $N"; fail=1; }
 [ "$imps"   -eq "$N" ]     || { echo "FAIL: **Impacto:** = $imps, esperado $N"; fail=1; }
