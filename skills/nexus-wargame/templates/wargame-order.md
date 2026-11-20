@@ -11,22 +11,24 @@ vai executar usando SÓ o teu ficheiro como fonte de julgamento — cada excepç
 não antecipares é uma falha que ele não sabe tratar.
 
 LÊ PRIMEIRO (por esta ordem):
-1. SKILL.md desta skill (os 8 elementos e os 4 fail-modes genéricos) + o spec do projecto
+1. [CAMINHO_SKILL]/SKILL.md (os 8 elementos, o formato exacto e os 4 fail-modes genéricos) + o spec do projecto
 2. [spec/persona/objectivo]
 3. [tasks/NN-*.md — esta missão]
 4. [success.md]
 5. [ledger.md — decisões humanas; defaults autorizados contam como decisão de trabalho]
 6. [OPCIONAL: 1 war-game já feito, como referência de calibre]
 
-Combate a missão no papel, movimento a movimento. Para CADA movimento declara os 8:
-1. Acção (concreta, executável por modelo médio)
-2. Observação esperada SE funcionou
-3. Observação esperada SE falhou
-4. Causa de falha mais provável
-5. Sinal de detecção (como e quão cedo o executor sabe)
-6. Contra-movimento (concreto, não "tenta outra vez")
-7. Trigger de bifurcação
-8. Condição de abort (parar e escalar)
+Combate a missão no papel, movimento a movimento. Cada movimento é um cabeçalho
+`### M<k> — <título>` seguido de EXACTAMENTE estas 8 linhas, com estes rótulos
+literais, nesta ordem (um verificador faz grep a eles — não mudes nomes nem numeração):
+1. **Acção:** concreta, executável por modelo médio
+2. **Se funcionou:** observação esperada SE funcionou
+3. **Se falhou:** observação esperada SE falhou
+4. **Causa provável:** causa de falha mais provável
+5. **Detecção:** sinal de detecção (como e quão cedo o executor sabe)
+6. **Contra-movimento:** concreto, não "tenta outra vez"
+7. **Bifurcação:** trigger de bifurcação
+8. **Abort:** condição de abort (parar e escalar)
 
 Cenários de falha OBRIGATÓRIOS além dos 4 fail-modes de SKILL.md (ToS = termos de serviço da plataforma, trust-boundary,
 cold-start, detecção-adversarial): [LISTA ESPECÍFICA DO DOMÍNIO — os modos de falha
