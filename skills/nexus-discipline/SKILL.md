@@ -35,7 +35,7 @@ Escada: **verificado-agora** > verificado-antes (<48h) > inferido > assumido. S�
 > **Escopo:** a triad completa aplica-se a execução multi-agente com gate (coordenador a ler status files). Trabalho single-agent sem coordenador: ISA + verify por turno chegam — o status-file não tem leitor.
 
 1. **ISA** (`{project}/.isa/ISA-<Lite|Full>-<slug>.md`) — frontmatter `phase:` (observe→…→complete), `status:`, ISCs como `- [ ]` binários; tick só com evidência no mesmo bloco.
-2. **Status file** (`/tmp/<project>-status/<agent>.status`) — `STATUS=working|done|blocked|need` + sentinela `@@DONE`/`@@BLOCKED`/`@@NEED`.
+2. **Status file** (por exemplo, se tiveres coordenador: `/tmp/<project>-status/<agent>.status`) — `STATUS=working|done|blocked|need` + sentinela `@@DONE`/`@@BLOCKED`/`@@NEED`.
 3. **Ad-hoc verify script** por turno (nome novo, scope deste turno, exit 0/1, limpo após correr).
 
 Verificar só 1 de 3 é insuficiente. Cada turno produz trabalho novo OU re-verify com script+evidência diferentes — re-correr o mesmo verify não é progresso (re-emendar só metadata para provocar um novo turno é um loop). **Quando o dono pede novidades ou exige resolução:** recupera o último entregável e a primeira dependência por satisfazer; executa a próxima acção autorizada que reduza essa dependência antes de responder. Não substituas aquisição, revisão ou entrega pendente por reexecução de testes sintéticos inalterados, nova ISA ou outro relatório de estado. Reporta o delta verificável, o bloqueio específico e a sequência de resolução; se só o dono puder desbloquear, pede a intervenção mínima concreta. Não sugiras trabalho entre turnos sem processo efectivamente lançado.
@@ -55,7 +55,7 @@ No fecho de cada milestone de um plano em execução:
 2. `state-snapshot.md` do milestone escrito/actualizado (template: `nexus-plan-spec/references/state-snapshot-template.md`).
 3. Checks mecânicos do batch **quando o milestone gerou/editou artefactos-plano** (paridade de fences, contagem de steps, numeração D#/migrações) — em milestones só-execução, N/A.
 4. Milestone correctness-oculta (sync/realtime, RLS/permissões, concorrência, crypto/auth) → review independente com modelo forte OBRIGATÓRIA antes de avançar. Se não podes despachar essa review, escreve `STATUS=need` e pára no gate — a escalada de modelo é do orquestrador.
-4b. Step destrutivo aplicado a meio do milestone (migração, delete) + step seguinte falha → NÃO continues nem revertas por improviso: PÁRA (§4.2) — o failure-tree ou o owner decidem o caminho de recuperação.
+4b. Step destrutivo aplicado a meio do milestone (migração, delete) + step seguinte falha → NÃO continues nem revertas por improviso: PÁRA (§4, ponto 2) — o failure-tree ou o owner decidem o caminho de recuperação.
 5. ISA da fase actualizado (ISCs ticked com evidência) + marco em disco, nunca só no chat.
 6. **Fecho de milestone COMMITA e ANUNCIA sem esperar pergunta:** commit granular do trabalho do milestone (mensagem descritiva) + actualização do `LOG.md` do projecto (se existir) fazem parte da checklist de fecho — não dependem de memória conversacional nem de pedido do owner. Push NÃO: continua decisão do owner. Anúncio = 1 linha no chat com hash + o que fechou.
 
@@ -101,6 +101,7 @@ No fecho de cada milestone de um plano em execução:
 | Owner tem o segredo, o agente não chega — pergunta estruturada | `references/structured-ask-owner-for-secret.md` |
 | Comandos com gate de aprovação em canais remotos | `references/approval-gated-commands-remote-channels.md` |
 | Esforço E1-E5 e processo de 7 fases | `references/effort-and-process.md` |
+| Glossário de termos (Rule 0/1, ISA, ISC, STATUS, owner…) | `references/glossary.md` |
 
 ## §8 — Regra anti-drift (como este ficheiro se mantém)
 

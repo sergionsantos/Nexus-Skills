@@ -81,3 +81,4 @@ Adicionar lição nova = ficheiro novo em `references/` + 1 linha aqui (ver SKIL
 |---|---|
 | `playbooks.md` | Playbooks — decision-trees executáveis |
 | `effort-and-process.md` | Esforço e processo — system prompt de execução |
+| `glossary.md` | Glossário — Rule 0/1, ISA, ISC, E1-E5, STATUS, owner, failure-tree… |

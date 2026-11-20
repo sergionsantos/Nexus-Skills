@@ -34,6 +34,18 @@ Text above the first `##` heading (title, front matter, any lede or abstract) is
 
 Languages: full polarity cues for en, pt, de, zh, ja, ko (`scripts/negation_lexicon.json`). For es, fr and it only the negation words that are not also English or Portuguese words are read (ningún, jamás, aucun, nessun, …): the plain negators "ne … pas" (fr) and "non" (it) are not, and Spanish "no" is read only when the text is not taken for Portuguese (where "no" is a contraction), so layer 1 can miss those negations. For other languages the score is word overlap only; say so in Limitations.
 
+### How a claim is linked to evidence, and why it comes out `needs_review` / `unsupported`
+
+`extract_claims.py extract` links each sentence to evidence **through its citation markers**: `[N]` becomes the N-th distinct source in `sources.jsonl` and is stored in the claim's `cited_source_ids`. `verify_claim_support.py` then scores the claim against **every `evidence.jsonl` quote whose `source_id` is one of those cited sources**. The `evidence_ids` field of a claim is optional and is `[]` after `extract` by design; an empty list is not the cause of a bad status. To pin a claim to specific evidence rows, create the claim with `extract_claims.py add --json '{"section_id":"...","text":"...","claim_type":"factual","cited_source_ids":["..."],"evidence_ids":["..."]}'` (there is no command that edits an existing claim).
+
+The status then follows from what is missing:
+
+* `unsupported` — the sentence has no `[N]` marker (and no `evidence_ids`). Cite it, or it is not a factual claim.
+* `needs_review` without notes — the cited source has no row in `evidence.jsonl`: run `evidence_store.py add` for that `source_id`.
+* `needs_review` with `low lexical overlap` / `entity mismatch` — rows exist but no quote shares enough words with the sentence (score < 0.6), or a capitalised name in the sentence (a product, person, country) is absent from every quote of its sources. Causes: the quote is too short or is the wrong span, the sentence is a paraphrase/synthesis of several sources while citing one, or **the report and the sources are in different languages** (the score is word overlap: a Portuguese sentence about an English page shares only numbers and names, so it will not reach `supported`). Fix by adding the quote that states the claim, citing the right `[N]`, or splitting the sentence. Do not edit the threshold.
+
+Treatment: in **quick** mode run `verify_claim_support.py verify` **without** `--strict` (it exits 0) and report the remaining `needs_review` claims as not independently verified in Methodology/Limitations. Use `--strict` in Standard, Deep and UltraDeep (Layer 6): it exits 1 while a flagged factual claim has no finished layer-4 votes, so it is a gate, not a diagnostic.
+
 ## Layer 2 — Quote fidelity
 
 Snapshot the raw text of every source you quote **when you fetch it**, not later (pages change):

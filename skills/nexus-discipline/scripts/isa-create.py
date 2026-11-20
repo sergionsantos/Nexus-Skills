@@ -86,7 +86,7 @@ phase: {phase}
 
 > **Phase:** `{phase}` — avança para `think` ao iniciar análise de risco.
 > Edita o campo `phase:` no frontmatter conforme progredes (observe→think→plan→build→execute→verify→learn→complete).
-> As unattended gates (`stop-review-gate.py`, `isa-enforce-gate.py`) leem este campo — mantê-lo actualizado é obrigatório.
+> (Opcional: só se tiveres hooks/gates que leiam `phase:`, mantê-lo actualizado é o que os faz funcionar.)
 
 ---
 

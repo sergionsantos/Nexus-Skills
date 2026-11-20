@@ -77,7 +77,7 @@ Todos os ISAs produzidos neste tier devem ter `phase:` no YAML frontmatter, avan
 observe → think → plan → build → execute → verify → learn → complete
 ```
 
-Omitir `phase:` desliga a gate unattended silenciosamente (`stop-review-gate.py` usa `_ISA_PATH_RE` — sem `phase:` o ISA é fail-open). É não-negociável.
+Mantém `phase:` actualizado. (Opcional: só se tiveres hooks/gates que leiam `phase:` — nesse caso, omiti-lo faz esses gates ignorarem o ISA; esses gates não vêm com esta skill.)
 
 ---
 

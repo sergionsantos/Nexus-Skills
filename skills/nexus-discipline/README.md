@@ -18,4 +18,4 @@ Disciplina de execução e verificação para agentes de código (Claude Code, C
 Copia (ou faz symlink) da pasta para `~/.claude/skills/nexus-discipline` ou `~/.codex/skills/nexus-discipline` (Windows: `%USERPROFILE%\.claude\skills\`).
 
 ## Dependências
-Nenhuma obrigatória. Scripts em Python 3 (`PYTHONUTF8=1` no Windows); `tests/run-tests.py` precisa de `pip install jsonschema`. Skills irmãs opcionais: `nexus-plan-spec`, `nexus-plan`, `session-resume`, `nexus-learner`, `nexus-skill-creator`, `session-wrap`.
+Nenhuma obrigatória. Scripts em Python 3; `tests/run-tests.py` precisa de `pip install jsonschema`. Skills irmãs opcionais: `nexus-plan-spec`, `nexus-plan`, `session-resume`, `nexus-learner`, `nexus-skill-creator`, `session-wrap`.

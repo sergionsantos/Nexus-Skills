@@ -9,7 +9,8 @@ Fork of [199-biotechnologies/claude-deep-research-skill](https://github.com/199-
 Copy (or symlink) this folder into your agent's skills directory:
 
 ```bash
-git clone <Nexus-Skills repo> ~/Nexus-Skills
+gh auth login   # the repo is private: needs a GitHub account that was invited to it
+git clone https://github.com/sergionsantos/Nexus-Skills.git ~/Nexus-Skills
 
 # Claude Code
 ln -s ~/Nexus-Skills/skills/nexus-deep-research ~/.claude/skills/nexus-deep-research
@@ -20,11 +21,13 @@ ln -s ~/Nexus-Skills/skills/nexus-deep-research ~/.codex/skills/nexus-deep-resea
 # Windows: copy the folder into %USERPROFILE%\.claude\skills\ instead of using ln -s
 ```
 
-Scripts are referenced as `scripts/<name>.py`, relative to the skill directory: run them as `python <skill_dir>/scripts/<name>.py`, where `<skill_dir>` is the symlink above. Core needs only the Python 3.9+ standard library. `pdftotext` (poppler) is needed by `verify_pdf_text.py`. Tests: `python3 -m pytest -q tests`.
+Scripts are referenced as `scripts/<name>.py`, relative to the skill directory: run them as `python <skill_dir>/scripts/<name>.py`, where `<skill_dir>` is the symlink above. Core needs only the Python 3.9+ standard library. Tests: `python3 -m pytest -q tests`.
 
-### Optional: search-cli (multi-provider search)
+### Optional dependencies
 
-For aggregated search across Brave, Serper, Exa, Jina, and Firecrawl:
+- `weasyprint` (`pip install weasyprint`): only for PDF output. Without it the PDF is not generated; the Markdown and HTML outputs are unaffected.
+- `pdftotext` (poppler): only for `verify_pdf_text.py`, which checks the text layer of a generated PDF (it uses `pypdf` if installed). Not needed for the rest.
+- `search-cli` (multi-provider search, not required: the agent's built-in web search is the default):
 
 ```bash
 brew tap 199-biotechnologies/tap && brew install search-cli
@@ -67,7 +70,7 @@ Key features:
 Reports saved to `./[topic]_[YYYYMMDD]/` (subdirectory of the cwd where the skill is invoked):
 - Markdown (primary source of truth)
 - HTML (McKinsey-style, auto-opened in browser)
-- PDF (professional print via WeasyPrint)
+- PDF (professional print via the `weasyprint` command; optional, see Installation): `md_to_html.py` produces the HTML with the standard library only, so without `weasyprint` the PDF is not generated and the Markdown and HTML still are
 
 Reports >18K words auto-continue via recursive agent spawning with context preservation.
 
@@ -84,9 +87,20 @@ Reports >18K words auto-continue via recursive agent spawning with context prese
 
 | Tool | Priority | Setup |
 |------|----------|-------|
-| search-cli | **Primary** — all searches go here first | `brew install search-cli` + API keys |
-| WebSearch | Fallback — if search-cli fails or rate-limited | None (built-in) |
-| Exa MCP | Optional — semantic/neural search alongside search-cli | MCP config |
+| WebSearch / your agent's own web search tool | **Default** — zero setup, use this unless you have a reason not to | None (built-in) |
+| search-cli | Optional — multi-provider aggregation (Brave, Serper, Exa, Jina, Firecrawl) | `brew install search-cli` + API keys |
+| Exa MCP | Optional — semantic/neural search alongside either | MCP config |
+
+## Glossary
+
+- **STORM** — perspective-guided question asking (Shao et al., 2024): before searching, name 3-6 perspectives that would ask different questions about the topic (`reference/retrieval-and-stopping.md` §2).
+- **Facets** — the individual things the answer must establish, each with a priority, a status and a counter-evidence state, tracked in `coverage.json`; retrieval stops on coverage, not on source count.
+- **Claim ledger** — `claims.jsonl` / `votes.jsonl` / `claim_ledger.jsonl`: every atomic factual claim of the report with its verifier votes and resolved status (`supported`, `refuted`, `contested`, `unverified`); `claim_ledger.py gate` is the delivery gate.
+- **Red team** — three fresh-context passes (Prosecutor, Methodologist, Reader) that attack the draft before delivery (Deep/UltraDeep).
+
+## Quick mode: expected warnings
+
+In quick mode `validate_report.py` prints warnings such as "Only N unique sources cited (recommended: ≥10)" or "Report is very short". These are **warnings, not errors**: the exit status stays successful ("VALIDATION PASSED (with warnings)") and they are expected for a short run. Errors (missing Executive Summary, no citations, missing `## Bibliography`, placeholders) must still be fixed. The step-by-step command sequence is in `SKILL.md`, "Minimal sequence (quick mode)".
 
 ## Architecture
 

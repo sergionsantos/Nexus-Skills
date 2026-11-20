@@ -71,7 +71,12 @@ Use the returned year for all date-filtered queries and recency checks. Do NOT a
 
 **CRITICAL: Use correct tool and parameters to avoid errors**
 
-**Primary: search-cli (multi-provider, always use first)**
+**Default: WebSearch / your agent's web search tool (zero setup)**
+- Built-in web search of Claude Code / Codex, no installation or API keys
+- Parameters: `query` (required), optional `allowed_domains`, `blocked_domains`
+- Use for every query unless search-cli is installed; it is also the fallback when search-cli returns errors or is rate-limited, and the tool for domain-restricted queries
+
+**Optional: search-cli (multi-provider; installed separately with `brew install search-cli`, needs API keys)**
 - Unified CLI aggregating Brave, Serper, Exa, Jina, and Firecrawl
 - Auto-detects best provider per query type (academic, news, general, people)
 - JSON output for structured processing: `search "query" --json`
@@ -81,14 +86,9 @@ Use the returned year for all date-filtered queries and recency checks. Do NOT a
 - For scraping: `search "URL" -m scrape --json`
 - Run via Bash tool: `search "query" --json -c 10`
 
-**Fallback: WebSearch (if search-cli fails or is unavailable)**
-- Built-in Claude web search, no setup required
-- Parameters: `query` (required), optional `allowed_domains`, `blocked_domains`
-- Use when: search-cli returns errors, rate-limited, or for domain-restricted queries
-
 **Optional: Exa MCP (if configured, for semantic/neural search)**
 - Tool name: `mcp__Exa__exa_search`
-- Use for semantic exploration alongside search-cli keyword results
+- Use for semantic exploration alongside WebSearch or search-cli results
 
 
 **NEVER mix parameter styles** - this causes "Invalid tool parameters" errors.
@@ -119,7 +119,7 @@ python scripts/evidence_store.py add --json '{"source_id": "...", "quote": "exac
 ```
 Evidence must not live only in model context — it must be persisted to `evidence.jsonl` before synthesis begins. This ensures continuation agents and claim-support verification can access the full evidence trail.
 
-**Example parallel execution (using search-cli via Bash):**
+**Example parallel execution (using search-cli via Bash, only if installed; otherwise issue the same queries with WebSearch):**
 ```
 [Single message with multiple Bash tool calls]
 - Bash: search "quantum computing 2026 state of the art" --json -c 10
@@ -179,8 +179,8 @@ As results arrive:
 - Prioritize high-credibility sources (>80) for core claims
 
 **Techniques:**
-- Use search-cli for all searches (primary tool, multi-provider)
-- Fall back to WebSearch if search-cli fails or is rate-limited
+- Use WebSearch (your agent's built-in web search) for all searches by default: zero setup
+- Use search-cli instead when it is installed (optional, multi-provider); fall back to WebSearch if it fails or is rate-limited
 - Read full sources with a raw-text capture tool (`web_extract`, `search -m extract`, `curl`, `pdftotext`); a summarising fetcher (WebFetch) only when raw capture failed, logged `verbatim: false` (see `reference/retrieval-and-stopping.md`)
 - Use Exa search (via WebSearch with type="neural") for semantic exploration
 - Use Grep/Read for local documentation

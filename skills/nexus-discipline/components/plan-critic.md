@@ -175,7 +175,7 @@ This guard exists because recursive self-review shares the author's confirmation
 
 ### Example E — Missing phase: field (HIGH consistency)
 ```json
-{"critique_completed":true,"findings":[{"severity":"HIGH","category":"consistency","isa_section":"frontmatter","description":"ISA frontmatter missing phase: field","evidence":"No phase: key in YAML header","recommendation":"Add 'phase: plan' to frontmatter (or current phase). Without it the unattended gate (stop-review-gate.py) ignores this ISA silently."}],"blocking":true,"recommendation":"revise","confidence":0.99,"summary":"Missing phase: field disables the nexus-discipline unattended gate. Fix is trivial — add one frontmatter line."}
+{"critique_completed":true,"findings":[{"severity":"HIGH","category":"consistency","isa_section":"frontmatter","description":"ISA frontmatter missing phase: field","evidence":"No phase: key in YAML header","recommendation":"Add 'phase: plan' to frontmatter (or current phase). Without it, any optional gate that reads phase: will ignore this ISA."}],"blocking":true,"recommendation":"revise","confidence":0.99,"summary":"Missing phase: field breaks any optional gate that reads it. Fix is trivial — add one frontmatter line."}
 ```
 
 ## Begin

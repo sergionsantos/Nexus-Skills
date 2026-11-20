@@ -19,8 +19,8 @@
 ## Template literal de dispatch
 
 ```python
-Agent(subagent_type="oh-my-claudecode:code-reviewer",  # código
-      # subagent_type="critic" / "oh-my-claudecode:critic" — planos/docs
+Agent(subagent_type="oh-my-claudecode:code-reviewer",  # ex.: só se tiveres esse plugin; usa o teu subagente de review. Código
+      # ex.: subagent_type="critic" / "oh-my-claudecode:critic" (se existirem) — planos/docs
       prompt="""REVIEW INDEPENDENTE — adversarial, tenta REFUTAR que está correcto.
 
 SPEC (o que deve fazer):

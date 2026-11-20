@@ -171,8 +171,8 @@ rm -f "$APP/.runtime-bulk.mjs"
 
 ## Sinais cruzados (quando esta skill combina com outras)
 
-- **falsificável verify + R3 cold-eyes**: negativos control devem ser derivados de findings cold-eyes que imagina. Se não consegue imaginar um input mau para um check, o check é hollow (Rule 0.8 §6.1).
+- **falsificável verify + R3 cold-eyes**: negativos control devem ser derivados de findings cold-eyes que imagina. Se não consegue imaginar um input mau para um check, o check é hollow (Rule 0, `SKILL.md` §1).
 
 - **env sanity + R2 CWD**: o `export PATH=...` backstop ajuda scripts em qualquer cwd. R2 complementa para `node_modules` resolution.
 
-- **threshold percentuais + R1 reversibilidade**: gate 5% em N=17 é trivial noise. Use **combinado** — read-only queries executam sempre (R1); queries de threshold PÁRAM-SE E interpretam-se (Rule 0.10); só mutações irreversíveis PÁRAM COM HARD gate (R1).
+- **threshold percentuais + R1 reversibilidade**: gate 5% em N=17 é trivial noise. Use **combinado** — read-only queries executam sempre (R1); queries de threshold PÁRAM-SE E interpretam-se (Rule 1, `SKILL.md` §1); só mutações irreversíveis PÁRAM COM HARD gate (R1).

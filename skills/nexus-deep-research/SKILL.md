@@ -50,6 +50,26 @@ Mode Selection
 
 **Note:** Phases 3-5 operate as an evidence loop per section (retrieve → evidence store → refine outline → draft → verify claims → delta-retrieve if needed), not as strict sequential gates.
 
+### Minimal sequence (quick mode)
+
+`scripts/research_engine.py` only prints phase instructions and writes `research_state_*.json`; it does not search, fetch or write the report. The run is manual, in this order (`[run]` = `./[topic]_[YYYYMMDD]/`; each command has `--help`; details in [report-assembly.md](./reference/report-assembly.md)):
+
+```bash
+python scripts/citation_manager.py init-run --out-dir [run] --query "..." --mode quick
+python scripts/citation_manager.py register-source --json '{"raw_url":"...","title":"...","year":"2026"}' --dir [run]   # prints source_id
+python scripts/verify_quotes.py snapshot --dir [run] --source-id [id] --origin "web_extract URL" --file page.txt        # raw text of the page
+python scripts/evidence_store.py add --json '{"source_id":"[id]","quote":"exact text from the page","evidence_type":"direct_quote","locator":"..."}' --dir [run]
+python scripts/citation_manager.py assign-display-numbers --dir [run]       # source_id -> [1], [2]...
+# write [run]/research_report_[YYYYMMDD]_[slug].md, citing [N] and ending with "## Bibliography"
+python scripts/extract_claims.py extract --dir [run] --report [report.md]
+python scripts/verify_claim_support.py verify --dir [run]                    # no --strict in quick
+python scripts/verify_quotes.py verify --dir [run]
+python scripts/validate_report.py --report [report.md]
+python scripts/verify_citations.py --report [report.md]
+```
+
+Pass `--json` as one quoted argument (on Windows shells, build it from Python or escape the inner quotes). A claim is linked to evidence by its `[N]` citation marker plus an `evidence.jsonl` row for that source: see Layer 1 of [adversarial-verification.md](./reference/adversarial-verification.md). Quick runs no claim ledger: state in Methodology that claims were not independently verified.
+
 ---
 
 ## Execution
