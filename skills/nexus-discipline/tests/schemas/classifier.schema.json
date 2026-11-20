@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tier-classifier output",
+  "type": "object",
+  "required": ["tier", "workflow_type", "validation_level", "needs_critic", "confidence", "reasoning", "analysis"],
+  "properties": {
+    "tier": {"type": "string", "enum": ["SIMPLE", "STANDARD", "COMPLEX"]},
+    "workflow_type": {"type": "string", "enum": ["FEATURE", "REFACTOR", "INVESTIGATION", "MIGRATION", "SIMPLE"]},
+    "validation_level": {"type": "string", "enum": ["TRIVIAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+    "needs_critic": {"type": "boolean"},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "reasoning": {"type": "string", "minLength": 10},
+    "analysis": {
+      "type": "object",
+      "required": ["scope", "integrations", "infrastructure", "knowledge", "risk"],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "required": ["estimated_files", "estimated_services", "is_cross_cutting"],
+          "properties": {
+            "estimated_files": {"type": "integer", "minimum": 0},
+            "estimated_services": {"type": "integer", "minimum": 0},
+            "is_cross_cutting": {"type": "boolean"}
+          }
+        },
+        "integrations": {
+          "type": "object",
+          "required": ["external_services", "new_dependencies", "research_needed"],
+          "properties": {
+            "external_services": {"type": "array", "items": {"type": "string"}},
+            "new_dependencies": {"type": "array", "items": {"type": "string"}},
+            "research_needed": {"type": "boolean"}
+          }
+        },
+        "infrastructure": {
+          "type": "object",
+          "required": ["docker_changes", "database_changes", "config_changes"],
+          "properties": {
+            "docker_changes": {"type": "boolean"},
+            "database_changes": {"type": "boolean"},
+            "config_changes": {"type": "boolean"}
+          }
+        },
+        "knowledge": {
+          "type": "object",
+          "required": ["patterns_exist", "unfamiliar_tech"],
+          "properties": {
+            "patterns_exist": {"type": "boolean"},
+            "unfamiliar_tech": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "risk": {
+          "type": "object",
+          "required": ["level", "concerns"],
+          "properties": {
+            "level": {"type": "string", "enum": ["low", "medium", "high"]},
+            "concerns": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}

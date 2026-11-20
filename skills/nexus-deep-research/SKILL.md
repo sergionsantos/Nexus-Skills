@@ -68,7 +68,7 @@ Mode Selection
 - Report structure: [report_template.md](./templates/report_template.md)
 - HTML styling: [mckinsey_report_template.html](./templates/mckinsey_report_template.html)
 
-**Scripts** (all in `scripts/` of this skill's directory — run as `python <skill_dir>/scripts/<name>.py`, e.g. `~/.claude/skills/nexus-deep-research/scripts/…` in Claude Code or the `skill_dir` Hermes reports; `[run]` is the output folder in the working directory):
+**Scripts** (all in `scripts/` of this skill's directory — run as `python <skill_dir>/scripts/<name>.py`, e.g. `~/.claude/skills/nexus-deep-research/scripts/…` in Claude Code; `[run]` is the output folder in the working directory):
 
 | Stage | Script |
 |---|---|

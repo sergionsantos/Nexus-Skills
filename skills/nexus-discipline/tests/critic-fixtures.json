@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Golden test fixtures for plan-critic.md (nexus-discipline).",
+  "cases": [
+    {
+      "id": "crt-001",
+      "scenario": "Clean ISA — every explicit ask in task_description has matching ISC and Test Strategy row. No drift. No ambiguity.",
+      "task_description": "Add /api/users endpoint returning paginated list. Include unit tests.",
+      "isa_fingerprint": "ISC-FUNC-01 endpoint exists; ISC-FUNC-02 returns paginated; ISC-QUAL-01 unit tests present; all rows in Test Strategy",
+      "expected": {
+        "critique_completed": true,
+        "findings": [],
+        "blocking": false,
+        "recommendation": "accept",
+        "confidence": 0.85,
+        "summary": "ISA covers all explicit asks. ISCs testable, scope clear, no contradictions."
+      }
+    },
+    {
+      "id": "crt-002",
+      "scenario": "ISC without test method — ISC-FUNC-01 exists but no row in Test Strategy section 8.",
+      "task_description": "Build dashboard showing user metrics",
+      "isa_fingerprint": "section 7 has ISC-FUNC-01 'metrics visible'; section 8 Test Strategy empty",
+      "expected": {
+        "critique_completed": true,
+        "findings": [
+          {
+            "severity": "HIGH",
+            "category": "completeness",
+            "isa_section": "8",
+            "description": "ISC-FUNC-01 has no corresponding test method in section 8",
+            "evidence": "Section 8 Test Strategy table contains no row matching ISC-FUNC-01",
+            "recommendation": "Add row: ISC-FUNC-01 | Manual UI inspection | Playwright | QA"
+          }
+        ],
+        "blocking": true,
+        "recommendation": "revise",
+        "confidence": 0.9,
+        "summary": "Untestable ISC blocks BUILD. Add Test Strategy row before proceeding."
+      }
+    },
+    {
+      "id": "crt-003",
+      "scenario": "Alignment failure — user asked X, ISA delivers Y. Scope drift.",
+      "task_description": "Receber webhook do Stripe, validar assinatura, gravar evento em Supabase",
+      "isa_fingerprint": "Goal: 'criar endpoint REST genérico'; no mention of Stripe signature validation or Supabase",
+      "expected": {
+        "critique_completed": true,
+        "findings": [
+          {
+            "severity": "HIGH",
+            "category": "alignment",
+            "isa_section": "6",
+            "description": "Goal drifts from explicit user request. Stripe signature validation absent.",
+            "evidence": "task_description: 'validar assinatura' — ISA goal: 'criar endpoint REST genérico'",
+            "recommendation": "Add ISC-SEC-01: 'Validates Stripe-Signature header via stripe.Webhook.construct_event()'"
+          },
+          {
+            "severity": "HIGH",
+            "category": "alignment",
+            "isa_section": "6",
+            "description": "Supabase persistence absent from goal/ISCs",
+            "evidence": "task_description: 'gravar evento em Supabase' — no Supabase mention in ISA",
+            "recommendation": "Add ISC-FUNC-02: 'Inserts event row into supabase.events table'"
+          }
+        ],
+        "blocking": true,
+        "recommendation": "revise",
+        "confidence": 0.95,
+        "summary": "Two HIGH alignment failures. BUILD would produce wrong artifact. Block until ISA fixed."
+      }
+    },
+    {
+      "id": "crt-004",
+      "scenario": "MEDIUM findings only — ISA is workable but has missing edge case and ambiguous threshold.",
+      "task_description": "Add caching to user profile endpoint",
+      "isa_fingerprint": "ISC-PERF-01 'performance acceptable'; no cache eviction strategy mentioned",
+      "expected": {
+        "critique_completed": true,
+        "findings": [
+          {
+            "severity": "MEDIUM",
+            "category": "completeness",
+            "isa_section": "7",
+            "description": "ISC-PERF-01 'performance acceptable' is not binary/testable",
+            "evidence": "- [ ] performance is acceptable",
+            "recommendation": "Specify measurable threshold (e.g., p95 cache-hit latency < 50ms)"
+          },
+          {
+            "severity": "MEDIUM",
+            "category": "completeness",
+            "isa_section": "9",
+            "description": "Cache eviction strategy missing from Features",
+            "evidence": "Features list omits TTL or LRU policy",
+            "recommendation": "Add 'TTL=300s with LRU eviction at 10000 entries'"
+          }
+        ],
+        "blocking": false,
+        "recommendation": "revise",
+        "confidence": 0.8,
+        "summary": "Two MEDIUM completeness gaps. Not blocking but BUILD will produce ambiguous artifact."
+      }
+    },
+    {
+      "id": "crt-005",
+      "scenario": "Reject — structurally incomplete ISA. Multiple sections empty.",
+      "task_description": "Build user dashboard",
+      "isa_fingerprint": "section 7 empty; section 8 empty; section 6 says 'do stuff'",
+      "expected": {
+        "critique_completed": true,
+        "findings": [
+          {
+            "severity": "HIGH",
+            "category": "completeness",
+            "isa_section": "7",
+            "description": "Section 7 Criteria is empty — no ISCs defined",
+            "evidence": "## 7. Criteria\\n[empty]",
+            "recommendation": "Rewrite ISA from template with at least 3 ISCs"
+          },
+          {
+            "severity": "HIGH",
+            "category": "completeness",
+            "isa_section": "8",
+            "description": "Section 8 Test Strategy empty",
+            "evidence": "## 8. Test Strategy\\n[empty]",
+            "recommendation": "Add test method per ISC"
+          },
+          {
+            "severity": "HIGH",
+            "category": "alignment",
+            "isa_section": "6",
+            "description": "Goal 'do stuff' is meaningless — fails SMART criteria",
+            "evidence": "## 6. Goal\\ndo stuff",
+            "recommendation": "Rewrite as measurable, specific goal with deadline"
+          }
+        ],
+        "blocking": true,
+        "recommendation": "reject",
+        "confidence": 0.95,
+        "summary": "Three HIGH findings span structural sections. ISA needs full rewrite, not patch."
+      }
+    },
+    {
+      "id": "crt-006",
+      "scenario": "Self-application case — ISA is for nexus-discipline itself. Critic must skip to avoid recursion.",
+      "task_description": "Implementar ROADMAP — port effort-classifier into the skill",
+      "isa_fingerprint": "title contains 'nexus-discipline'",
+      "expected": {
+        "critique_completed": true,
+        "findings": [],
+        "blocking": false,
+        "recommendation": "accept",
+        "confidence": 0.5,
+        "summary": "Self-critique skipped to avoid recursion. Manual review required."
+      }
+    }
+  ]
+}

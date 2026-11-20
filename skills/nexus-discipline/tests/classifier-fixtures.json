@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Golden test fixtures for tier-classifier.md (nexus-discipline). Each case maps task_description → expected classification output. Contract: 'tier' field (SIMPLE/STANDARD/COMPLEX). The E1-E5 mapping lives inside tier-classifier.md as an additive table.",
+  "cases": [
+    {
+      "id": "cls-001",
+      "task_description": "Fix typo in README.md homepage tagline",
+      "expected": {
+        "tier": "SIMPLE",
+        "workflow_type": "SIMPLE",
+        "validation_level": "TRIVIAL",
+        "needs_critic": false,
+        "confidence": 0.95,
+        "reasoning": "Documentation-only typo fix. Single file. No functional code change.",
+        "analysis": {
+          "scope": {"estimated_files": 1, "estimated_services": 0, "is_cross_cutting": false},
+          "integrations": {"external_services": [], "new_dependencies": [], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": false},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "low", "concerns": []}
+        }
+      }
+    },
+    {
+      "id": "cls-002",
+      "task_description": "Change primary button color from blue to brand green across the marketing site",
+      "expected": {
+        "tier": "SIMPLE",
+        "workflow_type": "SIMPLE",
+        "validation_level": "LOW",
+        "needs_critic": false,
+        "confidence": 0.9,
+        "reasoning": "UI tweak, contained CSS change. May touch 2-3 files but trivial.",
+        "analysis": {
+          "scope": {"estimated_files": 2, "estimated_services": 1, "is_cross_cutting": false},
+          "integrations": {"external_services": [], "new_dependencies": [], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": false},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "low", "concerns": []}
+        }
+      }
+    },
+    {
+      "id": "cls-003",
+      "task_description": "Add /api/users endpoint returning paginated user list with limit and offset query params",
+      "expected": {
+        "tier": "STANDARD",
+        "workflow_type": "FEATURE",
+        "validation_level": "MEDIUM",
+        "needs_critic": false,
+        "confidence": 0.85,
+        "reasoning": "New API endpoint following existing patterns. 3-5 files, one service, no external deps.",
+        "analysis": {
+          "scope": {"estimated_files": 4, "estimated_services": 1, "is_cross_cutting": false},
+          "integrations": {"external_services": [], "new_dependencies": [], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": false},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "low", "concerns": ["pagination edge cases"]}
+        }
+      }
+    },
+    {
+      "id": "cls-004",
+      "task_description": "Migrate authentication from session cookies to JWT tokens with refresh flow",
+      "expected": {
+        "tier": "STANDARD",
+        "workflow_type": "REFACTOR",
+        "validation_level": "HIGH",
+        "needs_critic": true,
+        "confidence": 0.85,
+        "reasoning": "Auth refactor is security-sensitive and cross-cutting. Needs critic to catch gaps.",
+        "analysis": {
+          "scope": {"estimated_files": 8, "estimated_services": 2, "is_cross_cutting": true},
+          "integrations": {"external_services": [], "new_dependencies": ["jsonwebtoken"], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": true},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "high", "concerns": ["breaking existing sessions", "token expiry edge cases"]}
+        }
+      }
+    },
+    {
+      "id": "cls-005",
+      "task_description": "Add Stripe payment integration for monthly subscriptions with webhook handling",
+      "expected": {
+        "tier": "STANDARD",
+        "workflow_type": "FEATURE",
+        "validation_level": "CRITICAL",
+        "needs_critic": true,
+        "confidence": 0.8,
+        "reasoning": "Payment integration is security/PCI-critical. Single external service but research needed.",
+        "analysis": {
+          "scope": {"estimated_files": 6, "estimated_services": 2, "is_cross_cutting": false},
+          "integrations": {"external_services": ["Stripe"], "new_dependencies": ["stripe"], "research_needed": true},
+          "infrastructure": {"docker_changes": false, "database_changes": true, "config_changes": true},
+          "knowledge": {"patterns_exist": false, "unfamiliar_tech": ["stripe"]},
+          "risk": {"level": "high", "concerns": ["webhook signature verification", "idempotency", "PCI compliance"]}
+        }
+      }
+    },
+    {
+      "id": "cls-006",
+      "task_description": "Investigate why login page intermittently returns 500 errors under load",
+      "expected": {
+        "tier": "STANDARD",
+        "workflow_type": "INVESTIGATION",
+        "validation_level": "MEDIUM",
+        "needs_critic": false,
+        "confidence": 0.7,
+        "reasoning": "Root-cause analysis. Scope unknown until traced. May escalate.",
+        "analysis": {
+          "scope": {"estimated_files": 0, "estimated_services": 1, "is_cross_cutting": false},
+          "integrations": {"external_services": [], "new_dependencies": [], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": false},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "medium", "concerns": ["unknown root cause"]}
+        }
+      }
+    },
+    {
+      "id": "cls-007",
+      "task_description": "Migrate user_profiles table from MySQL to Postgres with schema transformation",
+      "expected": {
+        "tier": "COMPLEX",
+        "workflow_type": "MIGRATION",
+        "validation_level": "CRITICAL",
+        "needs_critic": true,
+        "confidence": 0.9,
+        "reasoning": "Data migration across DBs with schema change. Risk of data loss. Needs critic and staging.",
+        "analysis": {
+          "scope": {"estimated_files": 5, "estimated_services": 2, "is_cross_cutting": true},
+          "integrations": {"external_services": [], "new_dependencies": ["psycopg2"], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": true, "config_changes": true},
+          "knowledge": {"patterns_exist": false, "unfamiliar_tech": []},
+          "risk": {"level": "high", "concerns": ["data loss", "downtime", "schema drift"]}
+        }
+      }
+    },
+    {
+      "id": "cls-008",
+      "task_description": "Add Graphiti memory integration with FalkorDB as optional layer toggled via .env variables, affecting agent reasoning across all services",
+      "expected": {
+        "tier": "COMPLEX",
+        "workflow_type": "FEATURE",
+        "validation_level": "HIGH",
+        "needs_critic": true,
+        "confidence": 0.9,
+        "reasoning": "Two new external deps (Graphiti, FalkorDB), new architectural pattern, cross-cutting via env toggle. Research needed.",
+        "analysis": {
+          "scope": {"estimated_files": 12, "estimated_services": 3, "is_cross_cutting": true},
+          "integrations": {"external_services": ["Graphiti", "FalkorDB"], "new_dependencies": ["graphiti-core", "falkordb"], "research_needed": true},
+          "infrastructure": {"docker_changes": true, "database_changes": true, "config_changes": true},
+          "knowledge": {"patterns_exist": false, "unfamiliar_tech": ["graphiti-core", "FalkorDB"]},
+          "risk": {"level": "high", "concerns": ["graph DB performance", "API key management", "feature flag complexity"]}
+        }
+      }
+    },
+    {
+      "id": "cls-009",
+      "task_description": "Update version in package.json from 1.4.2 to 1.4.3 for patch release",
+      "expected": {
+        "tier": "SIMPLE",
+        "workflow_type": "SIMPLE",
+        "validation_level": "TRIVIAL",
+        "needs_critic": false,
+        "confidence": 0.98,
+        "reasoning": "Version bump only. No code change.",
+        "analysis": {
+          "scope": {"estimated_files": 1, "estimated_services": 0, "is_cross_cutting": false},
+          "integrations": {"external_services": [], "new_dependencies": [], "research_needed": false},
+          "infrastructure": {"docker_changes": false, "database_changes": false, "config_changes": false},
+          "knowledge": {"patterns_exist": true, "unfamiliar_tech": []},
+          "risk": {"level": "low", "concerns": []}
+        }
+      }
+    },
+    {
+      "id": "cls-010",
+      "task_description": "Refactor monolith into microservices: split auth, billing, and notifications into separate services with API gateway and shared message queue",
+      "expected": {
+        "tier": "COMPLEX",
+        "workflow_type": "REFACTOR",
+        "validation_level": "CRITICAL",
+        "needs_critic": true,
+        "confidence": 0.95,
+        "reasoning": "Cross-cutting architectural refactor with new infra (queue, gateway). Maximum risk. Critic mandatory.",
+        "analysis": {
+          "scope": {"estimated_files": 100, "estimated_services": 4, "is_cross_cutting": true},
+          "integrations": {"external_services": ["api-gateway", "message-queue"], "new_dependencies": ["rabbitmq", "kong"], "research_needed": true},
+          "infrastructure": {"docker_changes": true, "database_changes": true, "config_changes": true},
+          "knowledge": {"patterns_exist": false, "unfamiliar_tech": ["kong"]},
+          "risk": {"level": "high", "concerns": ["data consistency", "deployment complexity", "rollback path"]}
+        }
+      }
+    }
+  ]
+}

@@ -204,6 +204,8 @@ class TestFusedWordHeuristic(unittest.TestCase):
         self.assertFalse(self.vpt.looks_fused('newspaper', dictionary=frozenset({'newspaper'})))
         self.assertFalse(self.vpt.looks_fused('newspapers', dictionary=frozenset({'newspaper'})))
 
+    @unittest.skipUnless(any(os.path.exists(p) for p in ('/usr/share/dict/words', '/usr/share/dict/american-english')),
+                         'needs a system word list (/usr/share/dict)')
     def test_real_run_together_text_still_flagged(self):
         flagged = self.vpt.check_run_together('The reportshows growth and the researchshows more; '
                                               'see thereport for details.')
