@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>nexus-deep-research — Guia rápido</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #1b2430; --muted: #5b6676; --line: #dde3ea;
+    --navy: #13294b; --teal: #0f7c80; --teal-soft: #e3f3f3;
+    --amber: #b86e00; --amber-soft: #fff3df;
+    --red: #b3261e; --red-soft: #fde8e6; --green: #1e7a3c; --green-soft: #e5f4ea;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9edf2; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); font-size: 8.9pt; line-height: 1.32; }
+  .page {
+    width: 210mm; height: 297mm; margin: 8mm auto; background: #fff;
+    padding: 10mm 13mm 8mm; display: flex; flex-direction: column; gap: 3mm;
+    overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.12); page-break-after: always;
+  }
+  .page > * { flex-shrink: 0; }
+  @media print { html, body { background: #fff; } .page { margin: 0; box-shadow: none; } }
+  h1 { font-size: 19pt; margin: 0; color: var(--navy); letter-spacing: -.3px; }
+  h2 { font-size: 11.5pt; margin: 0 0 2mm; color: var(--navy); display: flex; align-items: center; gap: 2mm; }
+  h2 .n { background: var(--teal); color: #fff; border-radius: 50%; width: 6mm; height: 6mm; font-size: 9pt;
+          display: inline-flex; align-items: center; justify-content: center; }
+  p { margin: 0 0 1.5mm; }
+  code { font-family: Menlo, Consolas, monospace; font-size: 8.4pt; background: #f1f4f7; padding: 0 1mm; border-radius: 2px; }
+  .hero { background: linear-gradient(120deg, var(--navy), var(--teal)); color: #fff; border-radius: 4mm; padding: 4.5mm 6mm; }
+  .hero h1 { color: #fff; }
+  .hero .sub { font-size: 11pt; margin-top: 1.5mm; opacity: .95; }
+  .hero .meta { font-size: 8pt; opacity: .8; margin-top: 2.5mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .card { border: 1px solid var(--line); border-radius: 3mm; padding: 2.6mm 3.5mm; }
+  .prompt { background: #f6f8fa; border-left: 3px solid var(--teal); padding: 1.1mm 2.6mm; margin: 1mm 0; font-style: italic; border-radius: 0 2mm 2mm 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.3pt; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 1.2mm 2mm; font-weight: 600; }
+  td { border-bottom: 1px solid var(--line); padding: 1.1mm 2mm; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  .pill { display: inline-block; padding: .3mm 2mm; border-radius: 10mm; font-size: 8pt; font-weight: 600; }
+  .p-q { background: #eef1f5; color: var(--muted); } .p-s { background: var(--teal-soft); color: var(--teal); }
+  .p-d { background: var(--amber-soft); color: var(--amber); } .p-u { background: var(--red-soft); color: var(--red); }
+  .flow { display: flex; flex-wrap: wrap; gap: 1.4mm; align-items: center; }
+  .step { background: var(--teal-soft); color: var(--teal); border-radius: 2mm; padding: 1.3mm 2.4mm; font-weight: 600; font-size: 8.6pt; }
+  .arrow { color: var(--muted); font-size: 9pt; }
+  .layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm; }
+  .layer { border-radius: 2.5mm; padding: 2mm 2.6mm; background: #f6f8fa; border-top: 3px solid var(--teal); }
+  .layer b { display: block; color: var(--navy); font-size: 9.2pt; margin-bottom: .6mm; }
+  .layer span { color: var(--muted); font-size: 8.4pt; }
+  .layer.l4 { border-top-color: var(--amber); } .layer.l5 { border-top-color: var(--red); } .layer.l6 { border-top-color: var(--navy); }
+  .do, .dont { border-radius: 3mm; padding: 2.4mm 3.5mm; }
+  .do { background: var(--green-soft); } .dont { background: var(--red-soft); }
+  .do h3, .dont h3 { margin: 0 0 1.5mm; font-size: 10pt; }
+  .do h3 { color: var(--green); } .dont h3 { color: var(--red); }
+  ul { margin: 0; padding-left: 4.5mm; } li { margin-bottom: .5mm; }
+  .check li { list-style: none; margin-left: -4.5mm; }
+  .check li::before { content: "☐  "; color: var(--teal); font-weight: 700; }
+  .status { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm; }
+  .st { border-radius: 2.5mm; padding: 2.2mm 2.6mm; font-size: 8.4pt; }
+  .st b { display: block; font-size: 9.2pt; margin-bottom: .5mm; }
+  .st.ok { background: var(--green-soft); } .st.ok b { color: var(--green); }
+  .st.ko { background: var(--red-soft); } .st.ko b { color: var(--red); }
+  .st.mid { background: var(--amber-soft); } .st.mid b { color: var(--amber); }
+  .st.un { background: #eef1f5; } .st.un b { color: var(--muted); }
+  .note { font-size: 8.2pt; color: var(--muted); }
+  .foot { margin-top: auto; font-size: 7.8pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 2mm; display: flex; justify-content: space-between; }
+
+  .tpl { background: #0f1b2d; color: #e6edf5; border-radius: 3mm; padding: 3mm 4mm; font-family: Menlo, Consolas, monospace; font-size: 8.1pt; line-height: 1.5; white-space: pre-wrap; }
+  .tpl .k { color: #7fd6d9; font-weight: 700; } .tpl .c { color: #8a9bb0; }
+  .ex { border: 1px solid var(--line); border-radius: 3mm; padding: 2.4mm 3.2mm; }
+  .ex .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2mm; }
+  .ex .hd b { color: var(--navy); font-size: 9.2pt; }
+  .ex .body { background: #f6f8fa; border-left: 3px solid var(--teal); padding: 1.4mm 2.6mm; font-size: 8.3pt; border-radius: 0 2mm 2mm 0; }
+  .ex .why { font-size: 7.9pt; color: var(--muted); margin-top: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- ================= PÁGINA 1 ================= -->
+<section class="page">
+  <div class="hero">
+    <h1>nexus-deep-research</h1>
+    <div class="sub">Pesquisa profunda com fontes citadas — e afirmações que são verificadas por quem não as escreveu.</div>
+    <div class="meta">Guia rápido · versão nexus 1.0 (commit 91fd47e, 20-11-2026) · Claude Code e Hermes</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2><span class="n">1</span>O que faz</h2>
+      <p>Pesquisa em várias fontes, guarda cada citação com a sua origem e escreve um relatório com bibliografia completa.</p>
+      <p>A diferença está no fim: antes de entregar, as afirmações passam por <b>6 camadas de verificação</b>. Uma afirmação desmentida pelas fontes não pode ficar no relatório, e o que não foi possível confirmar aparece marcado como tal — nunca como «confirmado».</p>
+    </div>
+    <div class="card">
+      <h2><span class="n">2</span>Como pedir</h2>
+      <p>Activa-se com «deep research», «análise aprofundada», «compara X com Y», «estado da arte».</p>
+      <div class="prompt">deep research: vale a pena migrar o nosso stack de Supabase para Postgres gerido? Decisão para 2027, foco em custo e risco.</div>
+      <div class="prompt">deep research em modo deep: evidência sobre jejum intermitente em adultos com mais de 50 anos.</div>
+      <p class="note">Não é para perguntas de 1-2 pesquisas nem para debugging.</p>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">3</span>Escolher o modo</h2>
+    <table>
+      <tr><th style="width:17%">Modo</th><th style="width:30%">Quando usar</th><th>O que é verificado</th></tr>
+      <tr><td><span class="pill p-q">Quick</span></td><td>Primeira exploração, resposta rápida</td><td>Só verificações automáticas (números, negações, citações). <b>Sem verificadores independentes</b> — o relatório diz isso.</td></tr>
+      <tr><td><span class="pill p-s">Standard</span> <span class="note">por defeito</span></td><td>A maioria das perguntas</td><td>As 6 camadas. Fontes da mesma origem dão aviso.</td></tr>
+      <tr><td><span class="pill p-d">Deep</span></td><td>Decisões importantes</td><td>As 6 camadas, com independência de fontes obrigatória (≥ 2 origens distintas por afirmação).</td></tr>
+      <tr><td><span class="pill p-u">UltraDeep</span></td><td>Revisão exaustiva, relatório longo</td><td>Como Deep, mais agentes em paralelo e relatórios com continuação automática.</td></tr>
+    </table>
+    <p class="note" style="margin-top:1.5mm">Diz o modo no pedido («em modo deep»). As durações do original (2-45 min) não contam com a verificação completa: conta com mais tempo em Standard e acima.</p>
+  </div>
+
+  <div>
+    <h2><span class="n">4</span>O que acontece por dentro</h2>
+    <div class="flow">
+      <span class="step">Âmbito</span><span class="arrow">→</span>
+      <span class="step">Plano + perspectivas</span><span class="arrow">→</span>
+      <span class="step">Pesquisa por facetas</span><span class="arrow">→</span>
+      <span class="step">Triangulação</span><span class="arrow">→</span>
+      <span class="step">Síntese</span><span class="arrow">→</span>
+      <span class="step">Crítica</span><span class="arrow">→</span>
+      <span class="step">Verificação</span><span class="arrow">→</span>
+      <span class="step">Relatório</span>
+    </div>
+    <p style="margin-top:2mm"><b>Perspectivas (STORM):</b> antes de pesquisar, o skill imagina 3-6 pessoas que perguntariam coisas diferentes (ex.: médico, doente, regulador, céptico) — pelo menos uma espera a resposta oposta. É daí que vem a contra-evidência.</p>
+    <p><b>Quando parar:</b> cada ponto essencial tem de ter evidência directa e uma pesquisa de contra-evidência. Depois, só pára após 2 rondas seguidas sem nada novo, ou declara que o orçamento acabou e lista o que ficou por cobrir.</p>
+  </div>
+
+  <div class="card" style="background:#f6f8fa">
+    <h2><span class="n">5</span>Como pedir bem — 6 coisas que melhoram muito o resultado</h2>
+    <div class="grid2" style="gap:2mm 6mm">
+      <ul>
+        <li><b>A decisão</b> que a pesquisa vai servir, não só o tema.</li>
+        <li><b>Quem lê</b>: tu, um cliente, uma equipa técnica.</li>
+        <li><b>Horizonte temporal</b>: «últimos 2 anos», «desde 2015».</li>
+      </ul>
+      <ul>
+        <li><b>Geografia</b>: Portugal, UE, global.</li>
+        <li><b>Fontes</b> que confias ou a evitar; documentos teus (docx, pptx, pdf) são aceites.</li>
+        <li><b>O que já sabes</b> ou suspeitas — para ser testado, não confirmado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot"><span>nexus-deep-research · guia rápido</span><span>1 / 3</span></div>
+</section>
+
+<!-- ================= PÁGINA 2 ================= -->
+<section class="page">
+  <div>
+    <h2><span class="n">6</span>As 6 camadas de verificação</h2>
+    <div class="layers">
+      <div class="layer"><b>1 · Sinais automáticos</b><span>Número da afirmação ausente ou diferente na fonte; negação trocada («subiu» vs «não subiu»).</span></div>
+      <div class="layer"><b>2 · Citações literais</b><span>Cada citação entre aspas é comparada com o texto guardado da fonte.</span></div>
+      <div class="layer"><b>3 · Registos científicos</b><span>DOI, arXiv e PubMed: o artigo existe, título e ano batem, não foi retractado.</span></div>
+      <div class="layer l4"><b>4 · Verificadores independentes</b><span>Agentes que não escreveram o texto votam afirmação a afirmação, lendo a fonte original.</span></div>
+      <div class="layer l5"><b>5 · Equipa vermelha</b><span>Acusador (procura o contrário), metodólogo (como se pesquisou) e leitor (o que falta para decidir).</span></div>
+      <div class="layer l6"><b>6 · Travão final</b><span>Se algum controlo falhar, o relatório sai como «parcial», com a falha dita às claras.</span></div>
+    </div>
+  </div>
+
+  <div>
+    <h2><span class="n">7</span>Como ler o resultado</h2>
+    <div class="status">
+      <div class="st ok"><b>Confirmada</b>Suportada por verificadores e fontes independentes.</div>
+      <div class="st mid"><b>Contestada</b>Há evidência dos dois lados — o relatório mostra ambas.</div>
+      <div class="st un"><b>Não verificada</b>Ninguém a conseguiu confirmar; vem qualificada no texto.</div>
+      <div class="st ko"><b>Refutada</b>Saiu do relatório. Se ficasse, mesmo negada, o travão bloqueava.</div>
+    </div>
+    <p style="margin-top:2mm">Recebes uma pasta <code>./[tema]_[data]/</code> com o relatório (Markdown, HTML e PDF) e os ficheiros de rasto: fontes, citações, votos dos verificadores e cobertura. Lê sempre as secções <b>Limitações</b> e <b>Metodologia</b>: é lá que o skill diz o que não conseguiu verificar.</p>
+  </div>
+
+  <div>
+    <h2><span class="n">8</span>Problema → o que fazer</h2>
+    <table>
+      <tr><th style="width:42%">Vês isto</th><th>Faz isto</th></tr>
+      <tr><td>Relatório marcado «parcial»</td><td>Vê qual controlo falhou (está escrito). Pede «continua a pesquisa sobre X» ou aceita com a limitação.</td></tr>
+      <tr><td>Muitas afirmações «não verificadas»</td><td>Pede modo Deep ou fontes primárias específicas; acima de 25% o travão já bloqueia.</td></tr>
+      <tr><td>Uma afirmação parece-te errada</td><td>Diz qual e porquê: entra como nova afirmação e volta aos verificadores.</td></tr>
+      <tr><td>Fontes todas da mesma origem</td><td>Pede «fontes independentes» ou modo Deep, onde isso é obrigatório.</td></tr>
+      <tr><td>Registo científico «erro» (sem rede)</td><td>Não é invenção: é desconhecido. Pede para repetir a verificação mais tarde.</td></tr>
+      <tr><td>Afirmação verdadeira assinalada</td><td>Esperado em alguns casos: o filtro automático é exigente; os verificadores decidem.</td></tr>
+    </table>
+  </div>
+
+  <div class="grid2">
+    <div class="do">
+      <h3>✓ Faz</h3>
+      <ul>
+        <li>Pede Deep para decisões com dinheiro, saúde ou contratos.</li>
+        <li>Dá documentos teus como fonte em vez de os resumires.</li>
+        <li>Pede explicitamente a contra-evidência mais forte.</li>
+        <li>Lê o anexo do registo de afirmações antes de citar números.</li>
+      </ul>
+    </div>
+    <div class="dont">
+      <h3>✕ Evita</h3>
+      <ul>
+        <li>Usar Quick para decidir — não tem verificadores independentes.</li>
+        <li>Corrigir repetindo a frase falsa («não é verdade que…»): escreve o que a fonte diz.</li>
+        <li>Pedir para baixar limites só para o relatório passar.</li>
+        <li>Tratar «não verificada» como «confirmada».</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">9</span>Checklist antes de usar uma conclusão</h2>
+    <ul class="check" style="columns:2; column-gap:8mm">
+      <li>O relatório não está marcado «parcial» (ou aceitei porquê).</li>
+      <li>Li Limitações e Metodologia.</li>
+      <li>Os números que vou usar estão «confirmados».</li>
+      <li>Há fontes de origens independentes.</li>
+      <li>A contra-evidência foi procurada e discutida.</li>
+      <li>Nenhuma fonte usada está retractada.</li>
+    </ul>
+  </div>
+
+  <div class="foot"><span>Fork de 199-biotechnologies/claude-deep-research-skill (MIT) · instalado em ~/code/nexus-deep-research</span><span>2 / 3</span></div>
+</section>
+
+<!-- ================= PÁGINA 3 ================= -->
+<section class="page">
+  <div>
+    <h2><span class="n">10</span>O pedido ideal — campos a preencher</h2>
+    <p>Copia, preenche o que souberes e apaga o resto. Só a <b>Pergunta</b> é obrigatória; cada campo a mais poupa uma ronda de perguntas e afina a pesquisa.</p>
+    <div class="tpl"><span class="k">deep research</span> em modo <span class="k">[quick | standard | deep | ultradeep]</span>
+<span class="k">Pergunta:</span>     [uma pergunta concreta, não um tema]
+<span class="k">Decisão:</span>      [o que vou decidir com isto]          <span class="c"># o campo que mais muda o resultado</span>
+<span class="k">Para quem:</span>    [eu | cliente | equipa técnica | investidor]
+<span class="k">Período:</span>      [ex.: 2022-2026 | desde 2015 | só o último ano]
+<span class="k">Geografia:</span>    [Portugal | UE | global]
+<span class="k">Fontes:</span>       usar [...] · evitar [...] · os meus ficheiros: [caminho .pdf/.docx/.pptx]
+<span class="k">Já sei:</span>       [o que suspeito — para ser testado, não confirmado]
+<span class="k">Formato:</span>      [relatório completo | resumo executivo de 1 página + anexos]
+<span class="k">Prazo:</span>        [quando preciso da resposta]          <span class="c"># ajuda a escolher o modo (tabela abaixo)</span></div>
+  </div>
+
+  <div>
+    <h2><span class="n">11</span>Prazos — quanto demora cada modo</h2>
+    <table>
+      <tr><th style="width:15%">Modo</th><th style="width:21%">Duração indicativa</th><th style="width:14%">Fases</th><th style="width:18%">Agentes de pesquisa</th><th>Fontes-alvo</th></tr>
+      <tr><td><span class="pill p-q">Quick</span></td><td>2-5 min</td><td>3</td><td>1</td><td>10+</td></tr>
+      <tr><td><span class="pill p-s">Standard</span></td><td>5-10 min <b>+ verificação</b></td><td>6</td><td>2-3</td><td>15+</td></tr>
+      <tr><td><span class="pill p-d">Deep</span></td><td>10-20 min <b>+ verificação</b></td><td>8</td><td>3-5</td><td>25+</td></tr>
+      <tr><td><span class="pill p-u">UltraDeep</span></td><td>20-45 min <b>+ verificação</b></td><td>8+</td><td>até 10, em ondas de 5</td><td>30+</td></tr>
+    </table>
+    <p class="note" style="margin-top:1.5mm"><b>Honestidade sobre os prazos:</b> as durações são as do skill original, que não tinha a verificação por agentes independentes. Nesta versão ainda não foram medidas numa pesquisa real; a verificação acrescenta tempo proporcional ao número de afirmações. O skill não tem um campo de prazo: escolhe o modo por esta tabela. Se a pesquisa parar antes de cobrir tudo, o relatório diz <i>orçamento esgotado</i> e lista o que ficou por cobrir.</p>
+  </div>
+
+  <div>
+    <h2><span class="n">12</span>Exemplos prontos a usar</h2>
+    <div class="grid2" style="gap:2.5mm">
+      <div class="ex"><div class="hd"><b>Negócio / decisão</b><span class="pill p-s">Standard</span></div>
+        <div class="body">deep research. Pergunta: migrar o nosso stack de Supabase gerido para Postgres próprio compensa? Decisão: avançar ou não em 2027. Para quem: eu e o CTO. Período: 2024-2026. Fontes: preços oficiais e post-mortems públicos; evitar blogs de vendedores. Já sei: suspeito que o custo de operação anula a poupança.</div>
+        <div class="why">Tem decisão, suspeita a testar e fontes a evitar — força a contra-evidência.</div></div>
+      <div class="ex"><div class="hd"><b>Saúde</b><span class="pill p-d">Deep</span></div>
+        <div class="body">deep research em modo deep. Pergunta: o jejum intermitente 16:8 reduz o peso e a glicemia em adultos com mais de 50 anos, comparado com restrição calórica simples? Período: ensaios desde 2015. Fontes: ensaios aleatorizados e meta-análises (PubMed); excluir estudos só em animais. Formato: resumo de 1 página + anexos.</div>
+        <div class="why">Saúde pede Deep: fontes independentes obrigatórias e retractações verificadas.</div></div>
+      <div class="ex"><div class="hd"><b>Imobiliário / regulação PT</b><span class="pill p-u">UltraDeep</span></div>
+        <div class="body">deep research em modo ultradeep. Pergunta: que mudanças legais e fiscais ao alojamento local em Lisboa e Porto entraram em vigor desde 2023 e qual o impacto medido na oferta e nos preços? Geografia: Portugal. Fontes: Diário da República, INE, Banco de Portugal. Para quem: investidor. Prazo: fim da semana.</div>
+        <div class="why">Muitas facetas (lei, fiscalidade, mercado) — UltraDeep reparte por mais agentes.</div></div>
+      <div class="ex"><div class="hd"><b>Exploração rápida</b><span class="pill p-q">Quick</span></div>
+        <div class="body">deep research em modo quick: quais são hoje as principais alternativas open-source ao Notion para equipas pequenas, e em que diferem? Só para ter um mapa antes de pesquisar a sério.</div>
+        <div class="why">Sem decisão em jogo: Quick serve para mapear. Para escolher, repete em Standard.</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:#f6f8fa">
+    <h2 style="margin-bottom:1mm"><span class="n">13</span>Depois do primeiro relatório</h2>
+    <p style="margin:0">Pedidos de seguimento úteis: <i>«continua a pesquisa sobre a faceta X»</i> · <i>«qual é a contra-evidência mais forte à conclusão 2?»</i> · <i>«a afirmação 7 parece-me errada porque…»</i> · <i>«refaz em modo deep só a parte de custos»</i>.</p>
+  </div>
+
+  <div class="foot"><span>nexus-deep-research · exemplos e prazos</span><span>3 / 3</span></div>
+</section>
+
+</body>
+</html>

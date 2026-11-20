@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResearchQuery",
+  "description": "One append-only queries.jsonl row. Cross-file references require verify_coverage.py.",
+  "type": "object",
+  "required": ["query_id", "round", "facet_ids", "gap", "family", "query", "provider", "expected_evidence", "result_source_ids", "new_relevant_source_ids", "coverage_changed", "notes"],
+  "properties": {
+    "query_id": { "type": "string", "minLength": 1 },
+    "round": { "type": "integer", "minimum": 1 },
+    "facet_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "gap": { "type": "string", "minLength": 1 },
+    "family": { "enum": ["literal", "synonym", "disciplinary", "entity", "source-specific", "counterevidence", "citation-neighborhood", "vocabulary-probe", "delta"] },
+    "query": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "expected_evidence": { "type": "string", "minLength": 1 },
+    "result_source_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "new_relevant_source_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "coverage_changed": { "type": "boolean" },
+    "notes": { "type": "string" },
+    "status": { "enum": ["success", "partial", "failed"] },
+    "error": { "type": ["string", "null"] },
+    "results_considered": { "type": ["integer", "null"], "minimum": 0 },
+    "error_category": { "$ref": "#/$defs/error_category", "description": "Category of a failed search, read by retrieval_health.py; null or absent means infer it from error text." },
+    "provider_failures": {
+      "type": "array",
+      "description": "Per-provider failures from a multi-provider search (search CLI envelope), read by retrieval_health.py even when the query as a whole succeeded.",
+      "items": {
+        "type": "object",
+        "required": ["provider"],
+        "properties": {
+          "provider": { "type": "string", "minLength": 1 },
+          "category": { "$ref": "#/$defs/error_category" },
+          "reason": { "type": ["string", "null"], "description": "Error text; used to infer the category when category is null or absent." }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "error_category": {
+      "description": "Must match retrieval_health.CATEGORIES (search CLI envelope.failure_categories + fetch/host outcomes).",
+      "enum": ["auth", "billing_quota", "rate_limit", "timeout", "network", "bad_request", "server", "parse", "config", "blocked", "no_sanctioned_route", "permission_denied", "not_found", "empty", "other", null]
+    }
+  },
+  "additionalProperties": false
+}

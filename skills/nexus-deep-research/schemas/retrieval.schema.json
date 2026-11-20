@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DocumentRetrievalAttempt",
+  "description": "One original-document access attempt in retrievals.jsonl, including failed and retried accesses.",
+  "type": "object",
+  "required": ["retrieval_id", "query_id", "tool", "url", "document_key", "status", "content_scope", "error"],
+  "properties": {
+    "retrieval_id": { "type": "string", "minLength": 1 },
+    "query_id": { "type": ["string", "null"], "minLength": 1 },
+    "tool": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "minLength": 1 },
+    "document_key": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["retrieved", "failed"] },
+    "content_scope": { "enum": ["full", "partial", "none"] },
+    "error": { "type": ["string", "null"] },
+    "verbatim": { "type": "boolean", "description": "Copied from extra.verbatim of a search -m extract result. false means the text is a paraphrase, not the document's own words." },
+    "error_category": { "$ref": "#/$defs/error_category", "description": "Failure category read by retrieval_health.py; null or absent means infer it from error text." }
+  },
+  "$defs": {
+    "error_category": {
+      "description": "Must match retrieval_health.CATEGORIES (search CLI envelope.failure_categories + fetch/host outcomes).",
+      "enum": ["auth", "billing_quota", "rate_limit", "timeout", "network", "bad_request", "server", "parse", "config", "blocked", "no_sanctioned_route", "permission_denied", "not_found", "empty", "other", null]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "retrieved" } } },
+      "then": { "properties": { "content_scope": { "enum": ["full", "partial"] } } },
+      "else": { "properties": { "content_scope": { "const": "none" }, "error": { "type": "string", "minLength": 1 } } }
+    }
+  ],
+  "additionalProperties": false
+}

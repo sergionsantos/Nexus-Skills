@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RunManifest",
+  "description": "Manifest for a single research run. Created at init, updated throughout.",
+  "type": "object",
+  "required": [
+    "version",
+    "query",
+    "mode",
+    "started_at",
+    "report_dir",
+    "artifact_paths"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "3.0.0"
+    },
+    "query": {
+      "type": "string",
+      "description": "Original research question"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "quick",
+        "standard",
+        "deep",
+        "ultradeep"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "default": null
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "assumption_id",
+          "text",
+          "materiality",
+          "status"
+        ],
+        "properties": {
+          "assumption_id": {
+            "type": "string",
+            "pattern": "^asm_[0-9a-f]{8}$"
+          },
+          "text": {
+            "type": "string"
+          },
+          "materiality": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "implicit",
+              "user_confirmed",
+              "evidence_validated"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "provider_config": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "Primary search provider (e.g. WebSearch)"
+        },
+        "scholarly": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Scholarly API provider if configured (e.g. openalex, semantic_scholar)"
+        }
+      },
+      "default": {
+        "primary": "search-cli",
+        "scholarly": null
+      }
+    },
+    "report_dir": {
+      "type": "string",
+      "description": "Absolute path to the report directory"
+    },
+    "artifact_paths": {
+      "type": "object",
+      "required": [
+        "sources",
+        "evidence",
+        "claims",
+        "report"
+      ],
+      "properties": {
+        "sources": {
+          "type": "string",
+          "default": "sources.jsonl"
+        },
+        "evidence": {
+          "type": "string",
+          "default": "evidence.jsonl"
+        },
+        "claims": {
+          "type": "string",
+          "default": "claims.jsonl"
+        },
+        "report": {
+          "type": "string",
+          "default": "report.md"
+        },
+        "coverage": {
+          "type": "string",
+          "default": "coverage.json"
+        },
+        "queries": {
+          "type": "string",
+          "default": "queries.jsonl"
+        },
+        "retrievals": {
+          "type": "string",
+          "default": "retrievals.jsonl"
+        }
+      },
+      "additionalProperties": false
+    },
+    "continuation": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Populated when resuming a previous run",
+      "properties": {
+        "previous_run_manifest": {
+          "type": "string"
+        },
+        "resumed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sections_completed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "default": null
+    },
+    "search_preflight": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Null until checked. A failed preflight selects an available fallback automatically.",
+      "required": [
+        "status",
+        "reason",
+        "selected_tool"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ok",
+            "fallback",
+            "blocked"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Why the preflight fell back or blocked; null when status is ok"
+        },
+        "selected_tool": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "retrieval_stop": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Mirrors coverage.json.stop after retrieval ends.",
+      "required": [
+        "reason",
+        "at",
+        "round",
+        "unresolved_high_priority_facet_ids",
+        "remaining_gaps",
+        "basis"
+      ],
+      "properties": {
+        "reason": {
+          "enum": [
+            "coverage-saturated",
+            "budget-exhausted",
+            "critical-error"
+          ]
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "round": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_high_priority_facet_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "remaining_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
