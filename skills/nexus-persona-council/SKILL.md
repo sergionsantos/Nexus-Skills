@@ -202,7 +202,7 @@ Nao passa pelo gate de convocacao (§3) (nao ha decisao type-1/type-2 a classifi
 <se isto for falso, o veredicto passa a ser o contrario — com o valor a que vira>
 
 ## Gate
-Gate de qualidade (auto-cheque): passa | falha  ·  cheque (a): <numero vs limiar>  ·  swap de sector: <n> argumentos nao sobrevivem a traducao (min. 2)
+Gate de qualidade (auto-cheque): passa | falha  ·  cheque (a): <numero vs limiar>  ·  swap de sector: <n> argumentos nao sobrevivem a traducao (min. 2; `solo` type-2: 1, escrito `1 argumento (type-2, limite assumido)`)
 Veredicto traduzido (<sector novo>, numeros fixos): "<a linha de veredicto re-instanciada>"
    ^ tem de deixar de fazer sentido. Se le bem, o parecer e portavel: refaz.
 Revisao independente: por rever          <- so muda depois de correr a lente independente
@@ -271,7 +271,7 @@ Sobrevive ao teste (bem) o argumento cujo facto e **intraduzivel**: uma restrica
 - O auto-cheque escreve o alvo que usou. **A lente independente atribui outro alvo, escolhido por ela**, e e o dela que conta.
 - O swap **nao muda de jurisdicao**: troca-se o sector, nao o pais nem o regime legal. Um facto que so e intraduzivel por mudar de regime fiscal nao conta como especificidade do caso.
 
-Conta quantos argumentos **nao sobrevivem a traducao**. Minimo **2**.
+Conta quantos argumentos **nao sobrevivem a traducao**. Minimo **2**. **Unica excepcao:** `solo` de decisao **type-2** (reversivel, §3) aceita **1** argumento intraduzivel, escrito no parecer como `swap de sector: 1 argumento (type-2, limite assumido)`; o veredicto traduzido continua a ter de deixar de fazer sentido. Type-1 (e duvida type-1/type-2, §3), `counsel` e `battle` mantem o minimo de 2.
 
 Porque assim e nao ao contrario: trocar os numeros premeia o modo de falha que este gate existe para matar. Quanto mais generica for a heuristica, MAIS sensivel a numeros ela e — "LTV/CAC 1,8 vs 3 -> corta" inverte lindamente quando se troca 1,8 por 4,2, e continua a servir qualquer negocio do mundo com 1,8. A frase que originou este gate — *"byte-a-byte igual para uma agencia de canalizacao no Ohio"* — e um swap **de sector com os numeros fixos**. E esse que mede.
 

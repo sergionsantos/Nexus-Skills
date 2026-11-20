@@ -6,4 +6,4 @@
 - **STOP** (SKILL §4.1): linha do LENS que fecha o caso quando se verifica; num `solo` o veredicto passa a `NAO HA CASO — <STOP literal>`.
 - **Ledger** (SKILL §4.3, `battle`): registo de todas as objeccoes candidatas (id, persona, texto, facto, falsificador, disposicao final), incluindo as cortadas.
 - **Tiger / Paper Tiger / Elephant** (SKILL §4.3): classes de objeccao sobrevivente — Tiger: plausivel, alto impacto, ha movimento a fazer agora; Paper Tiger: assusta mas o falsificador ja esta satisfeito; Elephant: real, grande, ninguem quer nomear.
-- **Teste Ohio / swap de sector** (SKILL §6): re-instanciar o veredicto noutro sector com os numeros fixos; se continua a fazer sentido, o parecer era generico e refaz-se.
+- **Teste Ohio / swap de sector** (SKILL §6): re-instanciar o veredicto noutro sector com os numeros fixos; se continua a fazer sentido, o parecer era generico e refaz-se. Minimo 2 argumentos intraduziveis; `solo` type-2 aceita 1 (`limite assumido`).

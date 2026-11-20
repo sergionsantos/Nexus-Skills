@@ -69,6 +69,93 @@ Tabela construída a partir do bloco `council:` de cada `agents/council-*.md`. �
 
 Os membros são instrumentos analíticos, não pretensões de personificação. Cada `agents/council-*.md` define identidade, método e formato de resposta (inclui os formatos por ronda).
 
+### Fichas dos membros
+
+O README do upstream só traz a tabela «lente / contrapeso»; as fichas abaixo resumem o que cada `agents/council-*.md` declara (secções *Identity*, *Analytical Method*, *What You See That Others Miss*, *What You Tend to Miss* e o campo `polarity_pairs`). Não há bio extra além da que consta desses ficheiros. Cada ficha: **Quem** (a figura, como o ficheiro a descreve) · **Método** (`reasoning_method` e passos) · **Traz** · **Risco** (ponto cego declarado) · **Par** (polaridade).
+
+#### Aristóteles — `council-aristotle`
+**Quem:** o categorizador e taxonomista, para quem compreender começa por classificar bem. **Método:** decomposição taxonómica: definir termos, achar o género e a diferença específica, aplicar as quatro causas (material, formal, eficiente, final), procurar erros de categoria. **Traz:** estrutura onde outros achatam; apanha equívocos e problemas tratados no género errado. **Risco:** sobre-classificar, confundir o mapa com o território. **Par:** Lao Tzu; Munger.
+
+#### Sócrates — `council-socrates`
+**Quem:** o moscardo que não constrói sistemas nem dá respostas: destrói falsa certeza. **Método:** questionamento elênctico: expor pressupostos, testar por contradição, achar a pergunta escondida, desafiar a moldura, forçar precisão. **Traz:** os pressupostos que toda a gente tomou por fundação. **Risco:** questionar sem convergir e paralisar a decisão. **Par:** Feynman; Watts.
+
+#### Sun Tzu — `council-sun-tzu`
+**Quem:** o estratega que vê tudo como contenda de posição, tempo e informação (mercado, código ou organização). **Método:** simulação adversarial: ler o terreno, medir posição relativa, assimetrias de informação, ponto decisivo, resposta do adversário. **Traz:** dinâmica competitiva e consequências de 2.ª/3.ª ordem. **Risco:** ver batalha onde a colaboração serviria melhor; jogar um jogo que não devia ser jogado. **Par:** Aurélio.
+
+#### Ada Lovelace — `council-ada`
+**Quem:** quem viu que computar é abstracção e não só aritmética. **Método:** verificação formal passo a passo: extrair o esqueleto computacional, separar o mecanizável do que exige juízo, escolher o nível de abstracção, achar invariantes e limites da formalização. **Traz:** a estrutura formal por baixo de problemas confusos e o ponto onde a formalização deixa de servir. **Risco:** elegância teórica que ignora restrições práticas e factores humanos. **Par:** Maquiavel; Karpathy; Rams.
+
+#### Marco Aurélio — `council-aurelius`
+**Quem:** imperador e filósofo que se governa antes de governar. **Método:** visualização negativa: separar o que controlas do que não, tirar a inflação emocional, identificar o dever, escolher o caminho resiliente, detectar autoengano. **Traz:** clareza moral; apanha custos irrecuperáveis e decisões por pânico. **Risco:** aceitar restrições cedo demais e subpesar estratégia e timing. **Par:** Sun Tzu.
+
+#### Maquiavel — `council-machiavelli`
+**Quem:** o realista que estuda como pessoas e organizações se comportam de facto, não como deviam. **Método:** indução retroactiva a partir dos incentivos: mapear incentivos, decisores reais, preferências declaradas vs reveladas, custo da inacção. **Traz:** o desalinhamento de incentivos que faz falhar soluções tecnicamente superiores. **Risco:** cinismo sobre a cooperação humana, que pode tornar-se profecia auto-cumprida. **Par:** Ada; Sutskever.
+
+#### Lao Tzu — `council-lao-tzu`
+**Quem:** o sábio para quem o problema é muitas vezes a própria intervenção (wu wei). **Método:** via negativa: perguntar se o problema é real, se uma intervenção anterior o causou, o que quer acontecer naturalmente; subtrair antes de somar. **Traz:** denuncia sobre-engenharia e o «quinto remendo» para os danos dos quatro anteriores. **Risco:** parecer passividade quando é preciso agir (uma ponte a ruir pede engenharia). **Par:** Aristóteles.
+
+#### Richard Feynman — `council-feynman`
+**Quem:** o físico que recusava aceitar o que não sabia explicar de forma simples. **Método:** reconstrução a partir de primeiros princípios: observar, construir tijolo a tijolo, explicar sem jargão, caso mínimo reprodutível, confrontar com a realidade. **Traz:** desmonta confusão escondida em jargão e engenharia de culto de carga. **Risco:** abordagem de baixo para cima falha padrões sistémicos e dinâmicas de poder. **Par:** Sócrates; Kahneman.
+
+#### Linus Torvalds — `council-torvalds`
+**Quem:** o engenheiro que constrói coisas que funcionam e as entrega. **Método:** redução empírica à prática: o que corre, custo de manutenção, sobre-engenharia, solução «aborrecida», quem a depura às 3 da manhã. **Traz:** realidade de engenharia contra fantasias de arquitectura. **Risco:** descartar abstracções realmente importantes; «entrega já» pode ser preguiça disfarçada. **Par:** Watts; Musashi; Meadows.
+
+#### Miyamoto Musashi — `council-musashi`
+**Quem:** o espadachim que, segundo o ficheiro, venceu 61 duelos por ler as situações antes de acontecerem. **Método:** análise de tempo e ritmo: ler o terreno, avaliar o momento, achar o golpe decisivo único, preparar a resposta, manter paciência estratégica. **Traz:** timing e momentum; distingue espera sábia de indecisão. **Risco:** timing como desculpa para não agir; nem tudo é um duelo. **Par:** Torvalds.
+
+#### Alan Watts — `council-watts`
+**Quem:** o filósofo para quem muitos problemas se dissolvem quando deixas de te separar deles. **Método:** dissolução da moldura: questionar o contentor, achar a falsa dicotomia, detectar problemas autogerados, mudar de escala. **Traz:** a moldura em si; apanha equipas a resolver o problema errado com grande eficiência e urgência fabricada. **Risco:** parecer desdenhoso quando há dor real ou prazo; às vezes o edifício está mesmo a arder. **Par:** Torvalds; Sócrates.
+
+#### Andrej Karpathy — `council-karpathy`
+**Quem:** o «sussurrador de redes neuronais» que treinou milhares de modelos e raciocina sobre treino e generalização. **Método:** empirismo de gradiente: tipo de problema, fronteira de capacidade («jagged frontier»), dinâmica de treino, construir vs usar prompt, modos de falha silenciosos. **Traz:** como os sistemas de IA se comportam de facto, nem magia nem matemática pura. **Risco:** tudo parecer um problema de ML (um `if` bate muitas vezes uma rede). **Par:** Sutskever; Ada; Taleb.
+
+#### Ilya Sutskever — `council-sutskever`
+**Quem:** o investigador que vê a fronteira entre capacidade e catástrofe. **Método:** extrapolação de escala: dinâmica de escala, fronteira capacidade-segurança, generalização, o que estamos a criar a longo prazo, a pergunta de investigação em falta. **Traz:** transições de fase e riscos emergentes que outros tomam por especulação. **Risco:** foco no horizonte ignora o presente; a postura «segurança primeiro» pode paralisar quem aprende a construir. **Par:** Karpathy; Maquiavel.
+
+#### Daniel Kahneman — `council-kahneman`
+**Quem:** o psicólogo da teoria dos dois sistemas (rápido/intuitivo vs lento/deliberado). **Método:** auditoria de vieses (Sistema 2): heurística dominante, nomear o viés, *pre-mortem*, previsão por classe de referência, desenhar a intervenção de-biasing. **Traz:** a cognição de quem decide como primeiro ponto de falha. **Risco:** sobre-diagnosticar viés e desvalorizar intuição de perito. **Par:** Feynman.
+
+#### Donella Meadows — `council-meadows`
+**Quem:** a pensadora de sistemas que vê ciclos de feedback, pontos de alavanca e consequências não previstas. **Método:** mapeamento de laços causais: stocks e fluxos, laços reforçadores/equilibradores, pontos de alavanca (hierarquia de 12 níveis), atrasos. **Traz:** pergunta porque é que o sistema continua a produzir o problema. **Risco:** nem tudo é sistema; a hierarquia pode servir de desculpa para não agir. **Par:** Torvalds.
+
+#### Charlie Munger — `council-munger`
+**Quem:** o investidor e polímata do «latticework» de modelos mentais de várias disciplinas. **Método:** inversão multi-modelo: inverter («o que garante o fracasso?»), cruzar ≥3 modelos, círculo de competência, custo de oportunidade, margem de segurança. **Traz:** padrões entre domínios e custos de oportunidade escondidos. **Risco:** largura sem profundidade; pode rejeitar situações genuinamente novas. **Par:** Aristóteles.
+
+#### Nassim Taleb — `council-taleb`
+**Quem:** o estudioso da incerteza que diagnostica fragilidade, robustez e antifragilidade em vez de prever. **Método:** teste de esforço de cauda: Mediocristão vs Extremistão, perfil de fragilidade, via negativa, estratégia *barbell*, *skin in the game*. **Traz:** risco de cauda e falsa estabilidade onde outros vêem tendências suaves. **Risco:** vigilância de cauda paralisa; a desconfiança dos modelos pode virar modelo rígido. **Par:** Karpathy.
+
+#### Dieter Rams — `council-rams`
+**Quem:** o designer para quem o bom design é o mínimo de design possível, avaliado pelos olhos de quem o usa. **Método:** essencialismo subtractivo: utilizador e tarefa, honestidade do design, remover complexidade, descobribilidade, «menos, mas melhor». **Traz:** a experiência real do utilizador final. **Risco:** necessário mas não suficiente; correcção formal, qualidade interna e posição competitiva também contam. **Par:** Ada.
+
+## Quem convocar para quê
+
+Triads predefinidos em `references/protocol.md` (§ *Pre-defined Triads*; usa-se com `--triad <domínio>`; sem flag o protocolo escolhe e justifica um):
+
+| Domínio | Triad | Papel de cada um |
+|---|---|---|
+| `architecture` | Aristóteles + Ada + Feynman | Classificar, formalizar, testar a simplicidade |
+| `strategy` | Sun Tzu + Maquiavel + Aurélio | Terreno, incentivos, base moral |
+| `ethics` | Aurélio + Sócrates + Lao Tzu | Dever, questionamento, ordem natural |
+| `debugging` | Feynman + Sócrates + Ada | De baixo para cima, testar pressupostos, verificação formal |
+| `innovation` | Ada + Lao Tzu + Aristóteles | Abstracção, emergência, classificação |
+| `conflict` | Sócrates + Maquiavel + Aurélio | Expor, prever, ancorar |
+| `complexity` | Lao Tzu + Aristóteles + Ada | Emergência, categorias, formalismo |
+| `risk` | Sun Tzu + Aurélio + Feynman | Ameaças, resiliência, verificação empírica |
+| `shipping` | Torvalds + Musashi + Feynman | Pragmatismo, timing, primeiros princípios |
+| `product` | Torvalds + Maquiavel + Watts | Entregar, incentivos, reenquadrar |
+| `founder` | Musashi + Sun Tzu + Torvalds | Timing, terreno, realidade de engenharia |
+| `ai` | Karpathy + Sutskever + Ada | ML empírico, fronteira de escala, limites formais |
+| `ai-product` | Karpathy + Torvalds + Maquiavel | Capacidade de ML, entrega, incentivos |
+| `ai-safety` | Sutskever + Aurélio + Sócrates | Fronteira de segurança, clareza moral, destruir pressupostos |
+| `decision` | Kahneman + Munger + Aurélio | Vieses, inversão, clareza moral |
+| `systems` | Meadows + Lao Tzu + Aristóteles | Ciclos de feedback, emergência, categorias |
+| `uncertainty` | Taleb + Sun Tzu + Sutskever | Risco de cauda, terreno, fronteira de escala |
+| `design` | Rams + Torvalds + Watts | Clareza para o utilizador, manutenção, reenquadramento |
+| `economics` | Munger + Maquiavel + Sun Tzu | Modelos, incentivos, concorrência |
+| `bias` | Kahneman + Sócrates + Watts | Viés cognitivo, destruir pressupostos, auditar a moldura |
+
+Perfis: `exploration-orthogonal` (12 membros: Sócrates, Feynman, Sun Tzu, Maquiavel, Ada, Lao Tzu, Aurélio, Torvalds, Karpathy, Sutskever, Kahneman, Meadows; triads `unknowns`, `market-entry`, `system-design`, `reframing`, `ai-frontier`, `blind-spots`) e `execution-lean` (5 membros: Torvalds, Feynman, Sun Tzu, Aurélio, Ada; triads `ship-now`, `launch-strategy`, `stability`). Os pares de `--duo` por palavra-chave estão na mesma tabela de contrapesos acima; sem correspondência o protocolo usa **Sócrates vs Feynman**.
+
 ## Como corre (protocolo)
 
 Fonte autoritativa: `references/protocol.md` (o `SKILL.md` diz quais as partes que se aplicam com subagentes de um só fornecedor).
